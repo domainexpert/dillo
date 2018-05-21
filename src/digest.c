@@ -21,18 +21,19 @@ static const char hexchars[] = "0123456789abcdef";
 
 static Dstr *md5hexdigest(const Dstr *data)
 {
-   md5_state_t state;
-   md5_byte_t digest[16];
-   Dstr *result = dStr_sized_new(33);
-   int i;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  md5_state_t state;
+  md5_byte_t digest[16];
+  Dstr *result = dStr_sized_new(33);
+  int i;
 
-   md5_init(&state);
-   md5_append(&state, (const md5_byte_t *)data->str, data->len);
-   md5_finish(&state, digest);
+  md5_init(&state);
+  md5_append(&state, (const md5_byte_t *)data->str, data->len);
+  md5_finish(&state, digest);
 
-   for (i = 0; i < 16; i++)
-      dStr_sprintfa(result, "%02x", digest[i]);
-   return result;
+  for (i = 0; i < 16; i++)
+    dStr_sprintfa(result, "%02x", digest[i]);
+  return result;
 }
 
 /*
@@ -40,12 +41,13 @@ static Dstr *md5hexdigest(const Dstr *data)
  */
 char *a_Digest_create_cnonce(void)
 {
-   int i;
-   char *result = dNew(char, 33);
-   for (i = 0; i < 32; i++)
-      result[i] = hexchars[rand() % 16];
-   result[32] = 0;
-   return result;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
+  char *result = dNew(char, 33);
+  for (i = 0; i < 32; i++)
+    result[i] = hexchars[rand() % 16];
+  result[32] = 0;
+  return result;
 }
 
 /*
@@ -54,13 +56,14 @@ char *a_Digest_create_cnonce(void)
 int a_Digest_compute_digest(AuthRealm_t *realm, const char *username,
                             const char *passwd)
 {
-   Dstr *a1;
-   Dstr *digest;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Dstr *a1;
+  Dstr *digest;
 
-   if (realm->algorithm == MD5 || realm->algorithm == ALGORITHMNOTSET) {
-      /* A1 = unq(username-value) ":" unq(realm-value) ":" passwd */
-      a1 = dStr_new(NULL);
-      dStr_sprintf(a1, "%s:%s:%s", username, realm->name, passwd);
+  if (realm->algorithm == MD5 || realm->algorithm == ALGORITHMNOTSET) {
+    /* A1 = unq(username-value) ":" unq(realm-value) ":" passwd */
+    a1 = dStr_new(NULL);
+    dStr_sprintf(a1, "%s:%s:%s", username, realm->name, passwd);
    } else if (realm->algorithm == MD5SESS) {
       /* A1 = H( unq(username-value) ":" unq(realm-value)
       **         ":" passwd )
@@ -93,15 +96,16 @@ static Dstr *Digest_create_response(AuthRealm_t *realm, const char *method,
                                     const char *digest_uri,
                                     const Dstr *entity_body)
 {
-   Dstr *ha2;
-   Dstr *result;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Dstr *ha2;
+  Dstr *result;
 
-   if (realm->qop == QOPNOTSET || realm->qop == AUTH) {
-      /* A2 = Method ":" digest-uri-value */
-      Dstr *a2 = dStr_new(NULL);
-      dStr_sprintf(a2, "%s:%s", method, digest_uri);
-      ha2 = md5hexdigest(a2);
-      dStr_free(a2, 1);
+  if (realm->qop == QOPNOTSET || realm->qop == AUTH) {
+    /* A2 = Method ":" digest-uri-value */
+    Dstr *a2 = dStr_new(NULL);
+    dStr_sprintf(a2, "%s:%s", method, digest_uri);
+    ha2 = md5hexdigest(a2);
+    dStr_free(a2, 1);
    } else if (realm->qop == AUTHINT) {
       /* A2 = Method ":" digest-uri-value ":" H(entity-body) */
       Dstr *hentity = md5hexdigest(entity_body);
@@ -143,16 +147,17 @@ static void Digest_Dstr_append_token_value(Dstr *str, int delimiter,
                                            const char *token,
                                            const char *value, int quoted)
 {
-   char c;
-   dStr_sprintfa(str, "%s%s=", (delimiter ? ", " : ""), token);
-   if (quoted) {
-      dStr_append_c(str, '"');
-      while ((c = *value++)) {
-         if (c == '"')
-            dStr_append_c(str, '\\');
-         dStr_append_c(str, c);
-      }
-      dStr_append_c(str, '"');
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char c;
+  dStr_sprintfa(str, "%s%s=", (delimiter ? ", " : ""), token);
+  if (quoted) {
+    dStr_append_c(str, '"');
+    while ((c = *value++)) {
+      if (c == '"')
+        dStr_append_c(str, '\\');
+      dStr_append_c(str, c);
+    }
+    dStr_append_c(str, '"');
    } else {
       dStr_append(str, value);
    }
@@ -169,22 +174,23 @@ static void Digest_Dstr_append_token_value(Dstr *str, int delimiter,
 char *a_Digest_authorization_hdr(AuthRealm_t *realm, const DilloUrl *url,
                                  const char *digest_uri)
 {
-   char *ret;
-   Dstr *response, *result;
-   const char *method = URL_FLAGS(url) & URL_Post ? "POST" : "GET";
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *ret;
+  Dstr *response, *result;
+  const char *method = URL_FLAGS(url) & URL_Post ? "POST" : "GET";
 
-   realm->nonce_count++;
-   response = Digest_create_response(realm, method, digest_uri, URL_DATA(url));
-   if (!response)
-      return NULL;
-   result = dStr_new("Authorization: Digest ");
-   Digest_Dstr_append_token_value(result, 0, "username", realm->username, 1);
-   Digest_Dstr_append_token_value(result, 1, "realm", realm->name, 1);
-   Digest_Dstr_append_token_value(result, 1, "nonce", realm->nonce, 1);
-   Digest_Dstr_append_token_value(result, 1, "uri", digest_uri, 1);
-   if (realm->qop != QOPNOTSET) {
-      Digest_Dstr_append_token_value(result, 1, "cnonce", realm->cnonce, 1);
-      dStr_sprintfa(result, ", nc=%08x", realm->nonce_count);
+  realm->nonce_count++;
+  response = Digest_create_response(realm, method, digest_uri, URL_DATA(url));
+  if (!response)
+    return NULL;
+  result = dStr_new("Authorization: Digest ");
+  Digest_Dstr_append_token_value(result, 0, "username", realm->username, 1);
+  Digest_Dstr_append_token_value(result, 1, "realm", realm->name, 1);
+  Digest_Dstr_append_token_value(result, 1, "nonce", realm->nonce, 1);
+  Digest_Dstr_append_token_value(result, 1, "uri", digest_uri, 1);
+  if (realm->qop != QOPNOTSET) {
+    Digest_Dstr_append_token_value(result, 1, "cnonce", realm->cnonce, 1);
+    dStr_sprintfa(result, ", nc=%08x", realm->nonce_count);
    }
    if (realm->algorithm != ALGORITHMNOTSET) {
       Digest_Dstr_append_token_value(result, 1, "algorithm",

@@ -87,18 +87,35 @@ class CustTabButton : public Fl_Button {
    uint_t focus_num_; // Used to choose which tab to focus when closing the
                       // active one (the highest numbered gets focus).
 public:
-   CustTabButton (int x,int y,int w,int h, const char* label = 0) :
-      Fl_Button (x,y,w,h,label) { ui_ = NULL; focus_num_ = 0; };
-   void ui(UI *pui) { ui_ = pui; }
-   UI *ui(void) { return ui_; }
-   void focus_num(uint_t fn) { focus_num_ = fn; }
-   uint_t focus_num(void) { return focus_num_; }
+  CustTabButton(int x, int y, int w, int h, const char *label = 0)
+      : Fl_Button(x, y, w, h, label) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+    ui_ = NULL;
+    focus_num_ = 0;
+  };
+  void ui(UI *pui) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+    ui_ = pui;
+  }
+  UI *ui(void) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+    return ui_;
+  }
+  void focus_num(uint_t fn) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+    focus_num_ = fn;
+  }
+  uint_t focus_num(void) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+    return focus_num_;
+  }
 };
 
 static int btn_cmp(const void *p1, const void *p2)
 {
-   return ((*(CustTabButton * const *)p1)->focus_num() -
-           (*(CustTabButton * const *)p2)->focus_num() );
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return ((*(CustTabButton * const *)p1)->focus_num() -
+          (*(CustTabButton * const *)p2)->focus_num());
 }
 
 /*
@@ -136,39 +153,41 @@ class CustTabs : public Fl_Group {
 public:
    CustTabs (int ww, int wh, int th, const char *lbl=0) :
       Fl_Group(0,0,ww,th,lbl) {
-      Pack = NULL;
-      focus_counter = 0;
-      tab_w = 50, tab_h = th, ctab_h = 1, btn_w = 20, ctl_w = 1*btn_w+2;
-      resize(0,0,ww,ctab_h);
-      /* tab buttons go inside a pack within a scroll */
-      Scroll = new Fl_Scroll(0,0,ww-ctl_w,ctab_h);
-      Scroll->type(0); /* no scrollbars */
-      Scroll->box(FL_NO_BOX);
-       Pack = new Fl_Pack(0,0,ww-ctl_w,tab_h);
-       Pack->type(Fl_Pack::HORIZONTAL);
-       Pack->box(FL_NO_BOX); //FL_THIN_DOWN_FRAME
-       Pack->end();
-      Scroll->end();
-      resizable(Scroll);
+     printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+     Pack = NULL;
+     focus_counter = 0;
+     tab_w = 50, tab_h = th, ctab_h = 1, btn_w = 20, ctl_w = 1 * btn_w + 2;
+     resize(0, 0, ww, ctab_h);
+     /* tab buttons go inside a pack within a scroll */
+     Scroll = new Fl_Scroll(0, 0, ww - ctl_w, ctab_h);
+     Scroll->type(0); /* no scrollbars */
+     Scroll->box(FL_NO_BOX);
+     Pack = new Fl_Pack(0, 0, ww - ctl_w, tab_h);
+     Pack->type(Fl_Pack::HORIZONTAL);
+     Pack->box(FL_NO_BOX); // FL_THIN_DOWN_FRAME
+     Pack->end();
+     Scroll->end();
+     resizable(Scroll);
 
-      /* control buttons go inside a group */
-      Control = new Fl_Group(ww-ctl_w,0,ctl_w,ctab_h);
-       CloseBtn = new CustButton(ww-ctl_w+2,0,btn_w,ctab_h, "X");
-       CloseBtn->box(FL_THIN_UP_BOX);
-       CloseBtn->clear_visible_focus();
-       CloseBtn->set_tooltip(prefs.right_click_closes_tab ?
-          "Close current tab.\nor Right-click tab label to close." :
-          "Close current tab.\nor Middle-click tab label to close.");
-       CloseBtn->callback(close_tab_btn_cb, this);
-       CloseBtn->hide();
-      Control->end();
+     /* control buttons go inside a group */
+     Control = new Fl_Group(ww - ctl_w, 0, ctl_w, ctab_h);
+     CloseBtn = new CustButton(ww - ctl_w + 2, 0, btn_w, ctab_h, "X");
+     CloseBtn->box(FL_THIN_UP_BOX);
+     CloseBtn->clear_visible_focus();
+     CloseBtn->set_tooltip(
+         prefs.right_click_closes_tab
+             ? "Close current tab.\nor Right-click tab label to close."
+             : "Close current tab.\nor Middle-click tab label to close.");
+     CloseBtn->callback(close_tab_btn_cb, this);
+     CloseBtn->hide();
+     Control->end();
 
-      box(FL_FLAT_BOX);
-      end();
+     box(FL_FLAT_BOX);
+     end();
 
-      Wizard = new Fl_Wizard(0,ctab_h,ww,wh-ctab_h);
-      Wizard->box(FL_NO_BOX);
-      Wizard->end();
+     Wizard = new Fl_Wizard(0, ctab_h, ww, wh - ctab_h);
+     Wizard->box(FL_NO_BOX);
+     Wizard->end();
    };
    int handle(int e);
    UI *add_new_tab(UI *old_ui, int focus);
@@ -186,12 +205,13 @@ public:
  */
 static void tab_btn_cb (Fl_Widget *w, void *cb_data)
 {
-   CustTabButton *btn = (CustTabButton*) w;
-   CustTabs *tabs = (CustTabs*) cb_data;
-   int b = Fl::event_button();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CustTabButton *btn = (CustTabButton *)w;
+  CustTabs *tabs = (CustTabs *)cb_data;
+  int b = Fl::event_button();
 
-   if (b == FL_LEFT_MOUSE) {
-      tabs->switch_tab(btn);
+  if (b == FL_LEFT_MOUSE) {
+    tabs->switch_tab(btn);
    } else if ((b == FL_RIGHT_MOUSE && prefs.right_click_closes_tab) ||
               (b == FL_MIDDLE_MOUSE && !prefs.right_click_closes_tab)) {
       // TODO: just an example, not necessarily final
@@ -204,21 +224,23 @@ static void tab_btn_cb (Fl_Widget *w, void *cb_data)
  */
 static void close_tab_btn_cb (Fl_Widget *, void *cb_data)
 {
-   CustTabs *tabs = (CustTabs*) cb_data;
-   int b = Fl::event_button();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CustTabs *tabs = (CustTabs *)cb_data;
+  int b = Fl::event_button();
 
-   if (b == FL_LEFT_MOUSE) {
-      a_UIcmd_close_bw(a_UIcmd_get_bw_by_widget(tabs->wizard()->value()));
+  if (b == FL_LEFT_MOUSE) {
+    a_UIcmd_close_bw(a_UIcmd_get_bw_by_widget(tabs->wizard()->value()));
    }
 }
 
 int CustTabs::handle(int e)
 {
-   int ret = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int ret = 0;
 
-   _MSG("CustTabs::handle e=%s\n", fl_eventnames[e]);
-   if (e == FL_KEYBOARD) {
-      return 0; // Receive as shortcut
+  _MSG("CustTabs::handle e=%s\n", fl_eventnames[e]);
+  if (e == FL_KEYBOARD) {
+    return 0; // Receive as shortcut
    } else if (e == FL_SHORTCUT) {
       UI *ui = (UI*)wizard()->value();
       BrowserWindow *bw = a_UIcmd_get_bw_by_widget(ui);
@@ -255,16 +277,20 @@ int CustTabs::handle(int e)
  */
 UI *CustTabs::add_new_tab(UI *old_ui, int focus)
 {
-   if (num_tabs() == 1) {
-      // Show tabbar
-      ctab_h = tab_h;
-      Wizard->resize(0,ctab_h,Wizard->w(),window()->h()-ctab_h);
-      resize(0,0,window()->w(),ctab_h);    // tabbar
-      CloseBtn->show();
-      {int w = 0, h; Pack->child(0)->measure_label(w, h);
-       Pack->child(0)->size(w+14,ctab_h);}
-      Pack->child(0)->show(); // first tab button
-      window()->init_sizes();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (num_tabs() == 1) {
+    // Show tabbar
+    ctab_h = tab_h;
+    Wizard->resize(0, ctab_h, Wizard->w(), window()->h() - ctab_h);
+    resize(0, 0, window()->w(), ctab_h); // tabbar
+    CloseBtn->show();
+    {
+      int w = 0, h;
+      Pack->child(0)->measure_label(w, h);
+      Pack->child(0)->size(w + 14, ctab_h);
+    }
+    Pack->child(0)->show(); // first tab button
+    window()->init_sizes();
    }
 
    /* The UI is constructed in a comfortable fitting size, and then resized
@@ -312,27 +338,28 @@ UI *CustTabs::add_new_tab(UI *old_ui, int focus)
  */
 void CustTabs::remove_tab(UI *ui)
 {
-   CustTabButton *btn;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CustTabButton *btn;
 
-   // get active tab idx
-   int act_idx = get_btn_idx((UI*)Wizard->value());
-   // get to-be-removed tab idx
-   int rm_idx = get_btn_idx(ui);
-   btn = (CustTabButton*)Pack->child(rm_idx);
+  // get active tab idx
+  int act_idx = get_btn_idx((UI *)Wizard->value());
+  // get to-be-removed tab idx
+  int rm_idx = get_btn_idx(ui);
+  btn = (CustTabButton *)Pack->child(rm_idx);
 
-   if (act_idx == rm_idx) {
-      // Active tab is being closed, switch to the "previous" one
-      CustTabButton *fbtn = NULL;
-      for (int i = 0; i < num_tabs(); ++i) {
-         if (i != rm_idx) {
-            if (!fbtn)
-               fbtn = (CustTabButton*)Pack->child(i);
-            CustTabButton *btn = (CustTabButton*)Pack->child(i);
-            if (btn->focus_num() > fbtn->focus_num())
-               fbtn = btn;
-         }
+  if (act_idx == rm_idx) {
+    // Active tab is being closed, switch to the "previous" one
+    CustTabButton *fbtn = NULL;
+    for (int i = 0; i < num_tabs(); ++i) {
+      if (i != rm_idx) {
+        if (!fbtn)
+          fbtn = (CustTabButton *)Pack->child(i);
+        CustTabButton *btn = (CustTabButton *)Pack->child(i);
+        if (btn->focus_num() > fbtn->focus_num())
+          fbtn = btn;
       }
-      switch_tab(fbtn);
+    }
+    switch_tab(fbtn);
    }
    Pack->remove(rm_idx);
    update_pack_offset();
@@ -356,10 +383,11 @@ void CustTabs::remove_tab(UI *ui)
 
 int CustTabs::get_btn_idx(UI *ui)
 {
-   for (int i = 0; i < num_tabs(); ++i) {
-      CustTabButton *btn = (CustTabButton*)Pack->child(i);
-      if (btn->ui() == ui)
-         return i;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  for (int i = 0; i < num_tabs(); ++i) {
+    CustTabButton *btn = (CustTabButton *)Pack->child(i);
+    if (btn->ui() == ui)
+      return i;
    }
    return -1;
 }
@@ -370,26 +398,27 @@ int CustTabs::get_btn_idx(UI *ui)
  */
 void CustTabs::update_pack_offset()
 {
-   dReturn_if (num_tabs() == 0);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  dReturn_if(num_tabs() == 0);
 
-   // get active tab button
-   int act_idx = get_btn_idx((UI*)Wizard->value());
-   CustTabButton *cbtn = (CustTabButton*)Pack->child(act_idx);
+  // get active tab button
+  int act_idx = get_btn_idx((UI *)Wizard->value());
+  CustTabButton *cbtn = (CustTabButton *)Pack->child(act_idx);
 
-   // calculate tab button's x() coordinates
-   int x_i = 0, x_f;
-   for (int j=0; j < act_idx; ++j)
-      x_i += Pack->child(j)->w();
-   x_f = x_i + cbtn->w();
+  // calculate tab button's x() coordinates
+  int x_i = 0, x_f;
+  for (int j = 0; j < act_idx; ++j)
+    x_i += Pack->child(j)->w();
+  x_f = x_i + cbtn->w();
 
-   int scr_x = Scroll->xposition(), scr_y = Scroll->yposition();
-   int px_i = x_i - scr_x;
-   int px_f = px_i + cbtn->w();
-   int pw = Scroll->window()->w() - ctl_w;
-   _MSG("  scr_x=%d btn_x=%d px_i=%d btn_w=%d px_f=%d pw=%d",
-       Scroll->xposition(),cbtn->x(),px_i,cbtn->w(),px_f,pw);
-   if (px_i < 0) {
-      Scroll->scroll_to(x_i, scr_y);
+  int scr_x = Scroll->xposition(), scr_y = Scroll->yposition();
+  int px_i = x_i - scr_x;
+  int px_f = px_i + cbtn->w();
+  int pw = Scroll->window()->w() - ctl_w;
+  _MSG("  scr_x=%d btn_x=%d px_i=%d btn_w=%d px_f=%d pw=%d",
+       Scroll->xposition(), cbtn->x(), px_i, cbtn->w(), px_f, pw);
+  if (px_i < 0) {
+    Scroll->scroll_to(x_i, scr_y);
    } else if (px_i > pw || (px_i > 0 && px_f > pw)) {
       Scroll->scroll_to(MIN(x_i, x_f-pw), scr_y);
    }
@@ -402,60 +431,65 @@ void CustTabs::update_pack_offset()
  */
 void CustTabs::switch_tab(CustTabButton *cbtn)
 {
-   int idx;
-   CustTabButton *btn;
-   BrowserWindow *bw;
-   UI *old_ui = (UI*)Wizard->value();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int idx;
+  CustTabButton *btn;
+  BrowserWindow *bw;
+  UI *old_ui = (UI *)Wizard->value();
 
-   if (cbtn && cbtn->ui() != old_ui) {
-      // Set old tab label to normal color
-      if ((idx = get_btn_idx(old_ui)) != -1) {
-         btn = (CustTabButton*)Pack->child(idx);
-         btn->color(PREFS_UI_TAB_BG_COLOR);
-         btn->labelcolor(PREFS_UI_TAB_FG_COLOR);
-         btn->redraw();
-      }
-      /* We make a point of calling show() before value() is changed because
-       * the wizard may hide the old one before showing the new one. In that
-       * case, the new UI gets focus with Fl::e_keysym set to whatever
-       * triggered the switch, and this is a problem when it's Tab/Left/Right/
-       * Up/Down because some widgets (notably Fl_Group and Fl_Input) exhibit
-       * unwelcome behaviour in that case. If the new widgets are already
-       * shown, fl_fix_focus will fix everything with Fl::e_keysym temporarily
-       * cleared.
-       */
-      cbtn->ui()->show();
-      Wizard->value(cbtn->ui());
-      cbtn->color(PREFS_UI_TAB_ACTIVE_BG_COLOR);
-      cbtn->labelcolor(PREFS_UI_TAB_ACTIVE_FG_COLOR);
-      cbtn->redraw();
-      update_pack_offset();
+  if (cbtn && cbtn->ui() != old_ui) {
+    // Set old tab label to normal color
+    if ((idx = get_btn_idx(old_ui)) != -1) {
+      btn = (CustTabButton *)Pack->child(idx);
+      btn->color(PREFS_UI_TAB_BG_COLOR);
+      btn->labelcolor(PREFS_UI_TAB_FG_COLOR);
+      btn->redraw();
+    }
+    /* We make a point of calling show() before value() is changed because
+     * the wizard may hide the old one before showing the new one. In that
+     * case, the new UI gets focus with Fl::e_keysym set to whatever
+     * triggered the switch, and this is a problem when it's Tab/Left/Right/
+     * Up/Down because some widgets (notably Fl_Group and Fl_Input) exhibit
+     * unwelcome behaviour in that case. If the new widgets are already
+     * shown, fl_fix_focus will fix everything with Fl::e_keysym temporarily
+     * cleared.
+     */
+    cbtn->ui()->show();
+    Wizard->value(cbtn->ui());
+    cbtn->color(PREFS_UI_TAB_ACTIVE_BG_COLOR);
+    cbtn->labelcolor(PREFS_UI_TAB_ACTIVE_FG_COLOR);
+    cbtn->redraw();
+    update_pack_offset();
 
-      // Update window title
-      if ((bw = a_UIcmd_get_bw_by_widget(cbtn->ui()))) {
-         const char *title = (cbtn->ui())->label();
-         UIcmd_set_window_labels(cbtn->window(), title ? title : "");
-      }
-      // Update focus priority
-      increase_focus_counter();
-      cbtn->focus_num(focus_counter);
+    // Update window title
+    if ((bw = a_UIcmd_get_bw_by_widget(cbtn->ui()))) {
+      const char *title = (cbtn->ui())->label();
+      UIcmd_set_window_labels(cbtn->window(), title ? title : "");
+    }
+    // Update focus priority
+    increase_focus_counter();
+    cbtn->focus_num(focus_counter);
    }
 }
 
 void CustTabs::prev_tab()
 {
-   int idx;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int idx;
 
-   if ((idx = get_btn_idx((UI*)Wizard->value())) != -1)
-      switch_tab((CustTabButton*)Pack->child(idx>0 ? idx-1 : num_tabs()-1));
+  if ((idx = get_btn_idx((UI *)Wizard->value())) != -1)
+    switch_tab(
+        (CustTabButton *)Pack->child(idx > 0 ? idx - 1 : num_tabs() - 1));
 }
 
 void CustTabs::next_tab()
 {
-   int idx;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int idx;
 
-   if ((idx = get_btn_idx((UI*)Wizard->value())) != -1)
-      switch_tab((CustTabButton*)Pack->child((idx+1<num_tabs()) ? idx+1 : 0));
+  if ((idx = get_btn_idx((UI *)Wizard->value())) != -1)
+    switch_tab(
+        (CustTabButton *)Pack->child((idx + 1 < num_tabs()) ? idx + 1 : 0));
 }
 
 /*
@@ -463,27 +497,28 @@ void CustTabs::next_tab()
  */
 void CustTabs::set_tab_label(UI *ui, const char *label)
 {
-   char title[128];
-   int idx = get_btn_idx(ui);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char title[128];
+  int idx = get_btn_idx(ui);
 
-   if (idx != -1) {
-      // Make a label for this tab
-      size_t tab_chars = 15, label_len = strlen(label);
+  if (idx != -1) {
+    // Make a label for this tab
+    size_t tab_chars = 15, label_len = strlen(label);
 
-      if (label_len > tab_chars)
-         tab_chars = a_Utf8_end_of_char(label, tab_chars - 1) + 1;
-      snprintf(title, tab_chars + 1, "%s", label);
-      if (label_len > tab_chars)
-         snprintf(title + tab_chars, 4, "...");
+    if (label_len > tab_chars)
+      tab_chars = a_Utf8_end_of_char(label, tab_chars - 1) + 1;
+    snprintf(title, tab_chars + 1, "%s", label);
+    if (label_len > tab_chars)
+      snprintf(title + tab_chars, 4, "...");
 
-      // Avoid unnecessary redraws
-      if (strcmp(Pack->child(idx)->label(), title)) {
-         int w = 0, h;
-         Pack->child(idx)->copy_label(title);
-         Pack->child(idx)->measure_label(w, h);
-         Pack->child(idx)->size(w+14,ctab_h);
-         update_pack_offset();
-      }
+    // Avoid unnecessary redraws
+    if (strcmp(Pack->child(idx)->label(), title)) {
+      int w = 0, h;
+      Pack->child(idx)->copy_label(title);
+      Pack->child(idx)->measure_label(w, h);
+      Pack->child(idx)->size(w + 14, ctab_h);
+      update_pack_offset();
+    }
    }
 }
 
@@ -491,13 +526,14 @@ void CustTabs::set_tab_label(UI *ui, const char *label)
 //----------------------------------------------------------------------------
 
 static void win_cb (Fl_Widget *w, void *cb_data) {
-   CustTabs *tabs = (CustTabs*) cb_data;
-   int choice = 1, ntabs = tabs->num_tabs();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CustTabs *tabs = (CustTabs *)cb_data;
+  int choice = 1, ntabs = tabs->num_tabs();
 
-   if (Fl::event_key() == FL_Escape) {
-      // Don't let FLTK close a browser window due to unhandled Escape
-      // (most likely with modifiers).
-      return;
+  if (Fl::event_key() == FL_Escape) {
+    // Don't let FLTK close a browser window due to unhandled Escape
+    // (most likely with modifiers).
+    return;
    }
 
    if (prefs.show_quit_dialog && ntabs > 1)
@@ -514,12 +550,13 @@ static void win_cb (Fl_Widget *w, void *cb_data) {
  */
 BrowserWindow *a_UIcmd_get_bw_by_widget(void *v_wid)
 {
-   BrowserWindow *bw;
-   for (int i = 0; i < a_Bw_num(); ++i) {
-      bw = a_Bw_get(i);
-      if (((UI*)bw->ui)->contains((Fl_Widget*)v_wid)) {
-         return bw;
-      }
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw;
+  for (int i = 0; i < a_Bw_num(); ++i) {
+    bw = a_Bw_get(i);
+    if (((UI *)bw->ui)->contains((Fl_Widget *)v_wid)) {
+      return bw;
+    }
    }
    return NULL;
 }
@@ -531,15 +568,16 @@ BrowserWindow *a_UIcmd_get_bw_by_widget(void *v_wid)
 BrowserWindow *a_UIcmd_browser_window_new(int ww, int wh,
                                           uint32_t xid, const void *vbw)
 {
-   BrowserWindow *old_bw = (BrowserWindow*)vbw;
-   BrowserWindow *new_bw = NULL;
-   UI *old_ui = old_bw ? BW2UI(old_bw) : NULL;
-   Fl_Window *win;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *old_bw = (BrowserWindow *)vbw;
+  BrowserWindow *new_bw = NULL;
+  UI *old_ui = old_bw ? BW2UI(old_bw) : NULL;
+  Fl_Window *win;
 
-   if (ww <= 0 || wh <= 0) {
-      // Set default geometry from dillorc.
-      ww = prefs.width;
-      wh = prefs.height;
+  if (ww <= 0 || wh <= 0) {
+    // Set default geometry from dillorc.
+    ww = prefs.width;
+    wh = prefs.height;
    }
 
    if (xid)
@@ -573,11 +611,12 @@ BrowserWindow *a_UIcmd_browser_window_new(int ww, int wh,
  */
 static void UIcmd_set_window_labels(Fl_Window *win, const char *str)
 {
-   const char *copy;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const char *copy;
 
-   win->Fl_Widget::copy_label(str);
-   copy = win->label();
-   win->label(copy, copy);
+  win->Fl_Widget::copy_label(str);
+  copy = win->label();
+  win->label(copy, copy);
 }
 
 /*
@@ -586,45 +625,46 @@ static void UIcmd_set_window_labels(Fl_Window *win, const char *str)
  */
 static BrowserWindow *UIcmd_tab_new(CustTabs *tabs, UI *old_ui, int focus)
 {
-   _MSG(" UIcmd_tab_new\n");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG(" UIcmd_tab_new\n");
 
-   // Create and set the UI
-   UI *new_ui = tabs->add_new_tab(old_ui, focus);
+  // Create and set the UI
+  UI *new_ui = tabs->add_new_tab(old_ui, focus);
 
-   // Now create the Dw render layout and viewport
-   FltkPlatform *platform = new FltkPlatform ();
-   Layout *layout = new Layout (platform);
-   style::Color *bgColor = style::Color::create (layout, prefs.bg_color);
-   layout->setBgColor (bgColor);
-   layout->setBgImage (NULL, style::BACKGROUND_REPEAT,
-                       style::BACKGROUND_ATTACHMENT_SCROLL,
-                       style::createPerLength (0), style::createPerLength (0));
+  // Now create the Dw render layout and viewport
+  FltkPlatform *platform = new FltkPlatform();
+  Layout *layout = new Layout(platform);
+  style::Color *bgColor = style::Color::create(layout, prefs.bg_color);
+  layout->setBgColor(bgColor);
+  layout->setBgImage(NULL, style::BACKGROUND_REPEAT,
+                     style::BACKGROUND_ATTACHMENT_SCROLL,
+                     style::createPerLength(0), style::createPerLength(0));
 
-   // set_render_layout() sets the proper viewport size
-   FltkViewport *viewport = new FltkViewport (0, 0, 0, 1);
-   viewport->box(FL_NO_BOX);
-   viewport->setBufferedDrawing (prefs.buffered_drawing ? true : false);
-   viewport->setDragScroll (prefs.middle_click_drags_page ? true : false);
-   layout->attachView (viewport);
-   new_ui->set_render_layout(viewport);
-   viewport->setScrollStep((int) rint(28.0 * prefs.font_factor));
+  // set_render_layout() sets the proper viewport size
+  FltkViewport *viewport = new FltkViewport(0, 0, 0, 1);
+  viewport->box(FL_NO_BOX);
+  viewport->setBufferedDrawing(prefs.buffered_drawing ? true : false);
+  viewport->setDragScroll(prefs.middle_click_drags_page ? true : false);
+  layout->attachView(viewport);
+  new_ui->set_render_layout(viewport);
+  viewport->setScrollStep((int)rint(28.0 * prefs.font_factor));
 
-   // Now, create a new browser window structure
-   BrowserWindow *new_bw = a_Bw_new();
+  // Now, create a new browser window structure
+  BrowserWindow *new_bw = a_Bw_new();
 
-   // Reference the UI from the bw
-   new_bw->ui = (void *)new_ui;
-   // Copy the layout pointer into the bw data
-   new_bw->render_layout = (void*)layout;
+  // Reference the UI from the bw
+  new_bw->ui = (void *)new_ui;
+  // Copy the layout pointer into the bw data
+  new_bw->render_layout = (void *)layout;
 
-   // Clear the window title
-   if (focus)
-      UIcmd_set_window_labels(new_ui->window(), new_ui->label());
+  // Clear the window title
+  if (focus)
+    UIcmd_set_window_labels(new_ui->window(), new_ui->label());
 
-   // WORKAROUND: see findbar_toggle()
-   new_ui->findbar_toggle(0);
+  // WORKAROUND: see findbar_toggle()
+  new_ui->findbar_toggle(0);
 
-   return new_bw;
+  return new_bw;
 }
 
 /*
@@ -632,18 +672,19 @@ static BrowserWindow *UIcmd_tab_new(CustTabs *tabs, UI *old_ui, int focus)
  */
 void a_UIcmd_close_bw(void *vbw)
 {
-   BrowserWindow *bw = (BrowserWindow *)vbw;
-   UI *ui = BW2UI(bw);
-   CustTabs *tabs = ui->tabs();
-   Layout *layout = (Layout*)bw->render_layout;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
+  UI *ui = BW2UI(bw);
+  CustTabs *tabs = ui->tabs();
+  Layout *layout = (Layout *)bw->render_layout;
 
-   _MSG("a_UIcmd_close_bw\n");
-   a_Bw_stop_clients(bw, BW_Root + BW_Img + BW_Force);
-   delete(layout);
-   if (tabs) {
-      tabs->remove_tab(ui);
-      if (tabs->num_tabs() == 0)
-         delete tabs->window();
+  _MSG("a_UIcmd_close_bw\n");
+  a_Bw_stop_clients(bw, BW_Root + BW_Img + BW_Force);
+  delete (layout);
+  if (tabs) {
+    tabs->remove_tab(ui);
+    if (tabs->num_tabs() == 0)
+      delete tabs->window();
    }
    a_Bw_free(bw);
 }
@@ -653,16 +694,17 @@ void a_UIcmd_close_bw(void *vbw)
  */
 void a_UIcmd_close_all_bw(void *)
 {
-   BrowserWindow *bw;
-   int choice = 1;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw;
+  int choice = 1;
 
-   if (prefs.show_quit_dialog && a_Bw_num() > 1)
-      choice = a_Dialog_choice("Dillo: Quit?",
-                               "More than one open tab or window.",
-                               "Quit", "Cancel", NULL);
-   if (choice == 1)
-      while ((bw = a_Bw_get(0)))
-         a_UIcmd_close_bw((void*)bw);
+  if (prefs.show_quit_dialog && a_Bw_num() > 1)
+    choice =
+        a_Dialog_choice("Dillo: Quit?", "More than one open tab or window.",
+                        "Quit", "Cancel", NULL);
+  if (choice == 1)
+    while ((bw = a_Bw_get(0)))
+      a_UIcmd_close_bw((void *)bw);
 }
 
 /*
@@ -671,23 +713,23 @@ void a_UIcmd_close_all_bw(void *)
  */
 static char *UIcmd_find_search_str(const char *str)
 {
-   int p;
-   char *url = NULL;
-   int len = strcspn(str, " ");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int p;
+  char *url = NULL;
+  int len = strcspn(str, " ");
 
-   if (len > 0 && str[len] != '\0') {
-      /* we found a ' ' in str, check whether the first part of str
-       * is a prefix of a search_url label
-       */
-      for (p = 0; p < dList_length(prefs.search_urls); p++) {
-         const char *search =
-            (const char *)dList_nth_data(prefs.search_urls, p);
-         if (search && strncasecmp(str, search, len) == 0) {
-            prefs.search_url_idx = p;
-            url = UIcmd_make_search_str(str + len + 1);
-            break;
-         }
+  if (len > 0 && str[len] != '\0') {
+    /* we found a ' ' in str, check whether the first part of str
+     * is a prefix of a search_url label
+     */
+    for (p = 0; p < dList_length(prefs.search_urls); p++) {
+      const char *search = (const char *)dList_nth_data(prefs.search_urls, p);
+      if (search && strncasecmp(str, search, len) == 0) {
+        prefs.search_url_idx = p;
+        url = UIcmd_make_search_str(str + len + 1);
+        break;
       }
+    }
    }
    return url;
 }
@@ -699,14 +741,15 @@ static char *UIcmd_find_search_str(const char *str)
  */
 void a_UIcmd_open_urlstr(void *vbw, const char *urlstr)
 {
-   char *new_urlstr;
-   char *search_urlstr = NULL;
-   DilloUrl *url;
-   int ch;
-   BrowserWindow *bw = (BrowserWindow*)vbw;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *new_urlstr;
+  char *search_urlstr = NULL;
+  DilloUrl *url;
+  int ch;
+  BrowserWindow *bw = (BrowserWindow *)vbw;
 
-   if ((search_urlstr = UIcmd_find_search_str(urlstr))) {
-      urlstr = search_urlstr;
+  if ((search_urlstr = UIcmd_find_search_str(urlstr))) {
+    urlstr = search_urlstr;
    }
    if (urlstr && *urlstr) {
       /* Filter URL string */
@@ -742,9 +785,10 @@ void a_UIcmd_open_urlstr(void *vbw, const char *urlstr)
  */
 void a_UIcmd_open_url(BrowserWindow *bw, const DilloUrl *url)
 {
-   if (url) {
-      a_Nav_push(bw, url, NULL);
-      BW2UI(bw)->focus_main();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (url) {
+    a_Nav_push(bw, url, NULL);
+    BW2UI(bw)->focus_main();
    } else {
       // Used to start a bw with a blank screen
       BW2UI(bw)->focus_location();
@@ -754,13 +798,14 @@ void a_UIcmd_open_url(BrowserWindow *bw, const DilloUrl *url)
 
 static void UIcmd_open_url_nbw(BrowserWindow *new_bw, const DilloUrl *url)
 {
-   /* When opening a new BrowserWindow (tab or real window) we focus
-    * Location if we don't yet have an URL, main otherwise.
-    */
-   if (url) {
-      a_Nav_push(new_bw, url, NULL);
-      a_UIcmd_set_location_text(new_bw, URL_STR(url));
-      BW2UI(new_bw)->focus_main();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  /* When opening a new BrowserWindow (tab or real window) we focus
+   * Location if we don't yet have an URL, main otherwise.
+   */
+  if (url) {
+    a_Nav_push(new_bw, url, NULL);
+    a_UIcmd_set_location_text(new_bw, URL_STR(url));
+    BW2UI(new_bw)->focus_main();
    } else {
       BW2UI(new_bw)->focus_location();
       a_UIcmd_set_buttons_sens(new_bw);
@@ -772,13 +817,14 @@ static void UIcmd_open_url_nbw(BrowserWindow *new_bw, const DilloUrl *url)
  */
 void a_UIcmd_open_url_nw(BrowserWindow *bw, const DilloUrl *url)
 {
-   int w, h;
-   BrowserWindow *new_bw;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int w, h;
+  BrowserWindow *new_bw;
 
-   a_UIcmd_get_wh(bw, &w, &h);
-   new_bw = a_UIcmd_browser_window_new(w, h, 0, bw);
+  a_UIcmd_get_wh(bw, &w, &h);
+  new_bw = a_UIcmd_browser_window_new(w, h, 0, bw);
 
-   UIcmd_open_url_nbw(new_bw, url);
+  UIcmd_open_url_nbw(new_bw, url);
 }
 
 /*
@@ -786,10 +832,11 @@ void a_UIcmd_open_url_nw(BrowserWindow *bw, const DilloUrl *url)
  */
 void a_UIcmd_open_url_nt(void *vbw, const DilloUrl *url, int focus)
 {
-   BrowserWindow *bw = (BrowserWindow *)vbw;
-   BrowserWindow *new_bw = UIcmd_tab_new(BW2UI(bw)->tabs(),
-                                         bw ? BW2UI(bw) : NULL, focus);
-   UIcmd_open_url_nbw(new_bw, url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
+  BrowserWindow *new_bw =
+      UIcmd_tab_new(BW2UI(bw)->tabs(), bw ? BW2UI(bw) : NULL, focus);
+  UIcmd_open_url_nbw(new_bw, url);
 }
 
 /*
@@ -797,7 +844,8 @@ void a_UIcmd_open_url_nt(void *vbw, const DilloUrl *url, int focus)
  */
 void a_UIcmd_back(void *vbw)
 {
-   a_Nav_back((BrowserWindow*)vbw);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Nav_back((BrowserWindow *)vbw);
 }
 
 /*
@@ -805,7 +853,8 @@ void a_UIcmd_back(void *vbw)
  */
 void a_UIcmd_back_popup(void *vbw, int x, int y)
 {
-   a_Menu_history_popup((BrowserWindow*)vbw, x, y, -1);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Menu_history_popup((BrowserWindow *)vbw, x, y, -1);
 }
 
 /*
@@ -813,7 +862,8 @@ void a_UIcmd_back_popup(void *vbw, int x, int y)
  */
 void a_UIcmd_forw(void *vbw)
 {
-   a_Nav_forw((BrowserWindow*)vbw);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Nav_forw((BrowserWindow *)vbw);
 }
 
 /*
@@ -821,7 +871,8 @@ void a_UIcmd_forw(void *vbw)
  */
 void a_UIcmd_forw_popup(void *vbw, int x, int y)
 {
-   a_Menu_history_popup((BrowserWindow*)vbw, x, y, 1);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Menu_history_popup((BrowserWindow *)vbw, x, y, 1);
 }
 
 /*
@@ -829,7 +880,8 @@ void a_UIcmd_forw_popup(void *vbw, int x, int y)
  */
 void a_UIcmd_home(void *vbw)
 {
-   a_UIcmd_open_url((BrowserWindow*)vbw, prefs.home);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_UIcmd_open_url((BrowserWindow *)vbw, prefs.home);
 }
 
 /*
@@ -837,7 +889,8 @@ void a_UIcmd_home(void *vbw)
  */
 void a_UIcmd_reload(void *vbw)
 {
-   a_Nav_reload((BrowserWindow*)vbw);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Nav_reload((BrowserWindow *)vbw);
 }
 
 /*
@@ -845,7 +898,8 @@ void a_UIcmd_reload(void *vbw)
  */
 void a_UIcmd_repush(void *vbw)
 {
-   a_Nav_repush((BrowserWindow*)vbw);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Nav_repush((BrowserWindow *)vbw);
 }
 
 /*
@@ -853,7 +907,8 @@ void a_UIcmd_repush(void *vbw)
  */
 void a_UIcmd_redirection0(void *vbw, const DilloUrl *url)
 {
-   a_Nav_redirection0((BrowserWindow*)vbw, url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Nav_redirection0((BrowserWindow *)vbw, url);
 }
 
 /*
@@ -861,20 +916,21 @@ void a_UIcmd_redirection0(void *vbw, const DilloUrl *url)
  */
 static char *UIcmd_make_save_filename(const DilloUrl *url)
 {
-   size_t MaxLen = 64;
-   const char *dir = save_dir, *path, *path2, *query;
-   char *name, *free1, *free2, *n1, *n2;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  size_t MaxLen = 64;
+  const char *dir = save_dir, *path, *path2, *query;
+  char *name, *free1, *free2, *n1, *n2;
 
-   free1 = free2 = NULL;
+  free1 = free2 = NULL;
 
-   /* get the last component of the path */
-   path = URL_PATH(url);
-   path2 = strrchr(path, '/');
-   path = path2 ? path2 + 1 : path;
+  /* get the last component of the path */
+  path = URL_PATH(url);
+  path2 = strrchr(path, '/');
+  path = path2 ? path2 + 1 : path;
 
-   /* truncate the path if necessary */
-   if (strlen(path) > MaxLen) {
-      path = free1 = dStrndup(path, MaxLen);
+  /* truncate the path if necessary */
+  if (strlen(path) > MaxLen) {
+    path = free1 = dStrndup(path, MaxLen);
    }
 
    /* is there a query? */
@@ -911,14 +967,13 @@ static char *UIcmd_make_save_filename(const DilloUrl *url)
  */
 void a_UIcmd_init(void)
 {
-   const char *dir = prefs.save_dir;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const char *dir = prefs.save_dir;
 
-   if (dir && *dir) {
-      // assert a trailing '/'
-      save_dir =
-         (dir[strlen(dir)-1] == '/')
-         ? dStrdup(dir)
-         : dStrconcat(dir, "/", NULL);
+  if (dir && *dir) {
+    // assert a trailing '/'
+    save_dir = (dir[strlen(dir) - 1] == '/') ? dStrdup(dir)
+                                             : dStrconcat(dir, "/", NULL);
    }
 }
 
@@ -927,18 +982,19 @@ void a_UIcmd_init(void)
  */
 static int UIcmd_save_file_check(const char *name)
 {
-   struct stat ss;
-   if (stat(name, &ss) == 0) {
-      Dstr *ds;
-      int ch;
-      ds = dStr_sized_new(128);
-      dStr_sprintf(ds,
-                  "The file:\n  %s (%d Bytes)\nalready exists. What do we do?",
-                   name, (int)ss.st_size);
-      ch = a_Dialog_choice("Dillo Save: File exists!", ds->str,
-                           "Abort", "Continue", "Rename", NULL);
-      dStr_free(ds, 1);
-      return ch;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  struct stat ss;
+  if (stat(name, &ss) == 0) {
+    Dstr *ds;
+    int ch;
+    ds = dStr_sized_new(128);
+    dStr_sprintf(ds,
+                 "The file:\n  %s (%d Bytes)\nalready exists. What do we do?",
+                 name, (int)ss.st_size);
+    ch = a_Dialog_choice("Dillo Save: File exists!", ds->str, "Abort",
+                         "Continue", "Rename", NULL);
+    dStr_free(ds, 1);
+    return ch;
    } else {
       return 2; /* assume the file does not exist, so Continue */
    }
@@ -950,32 +1006,33 @@ static int UIcmd_save_file_check(const char *name)
 static void UIcmd_save(BrowserWindow *bw, const DilloUrl *url,
                        const char *title)
 {
-   char *SuggestedName = UIcmd_make_save_filename(url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *SuggestedName = UIcmd_make_save_filename(url);
 
-   while (1) {
-      const char *name = a_Dialog_save_file(title, NULL, SuggestedName);
-      dFree(SuggestedName);
+  while (1) {
+    const char *name = a_Dialog_save_file(title, NULL, SuggestedName);
+    dFree(SuggestedName);
 
-      if (name) {
-         switch (UIcmd_save_file_check(name)) {
-         case 0:
-         case 1:
-            /* Abort */
-            return;
-         case 2:
-            /* Continue */
-            MSG("UIcmd_save: %s\n", name);
-            a_Nav_save_url(bw, url, name);
-            return;
-         default:
-            /* Rename */
-            break; /* prompt again */
-         }
-      } else {
-         return; /* no name, so Abort */
+    if (name) {
+      switch (UIcmd_save_file_check(name)) {
+      case 0:
+      case 1:
+        /* Abort */
+        return;
+      case 2:
+        /* Continue */
+        MSG("UIcmd_save: %s\n", name);
+        a_Nav_save_url(bw, url, name);
+        return;
+      default:
+        /* Rename */
+        break; /* prompt again */
       }
+    } else {
+      return; /* no name, so Abort */
+    }
 
-      SuggestedName = dStrdup(name);
+    SuggestedName = dStrdup(name);
    }
 }
 
@@ -984,11 +1041,12 @@ static void UIcmd_save(BrowserWindow *bw, const DilloUrl *url,
  */
 void a_UIcmd_save(void *vbw)
 {
-   BrowserWindow *bw = (BrowserWindow *)vbw;
-   const DilloUrl *url = a_History_get_url(NAV_TOP_UIDX(bw));
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
+  const DilloUrl *url = a_History_get_url(NAV_TOP_UIDX(bw));
 
-   if (url) {
-      UIcmd_save(bw, url, "Save Page as File");
+  if (url) {
+    UIcmd_save(bw, url, "Save Page as File");
    }
 }
 
@@ -997,7 +1055,8 @@ void a_UIcmd_save(void *vbw)
  */
 const char *a_UIcmd_select_file()
 {
-   return a_Dialog_select_file("Dillo: Select a File", NULL, NULL);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return a_Dialog_select_file("Dillo: Select a File", NULL, NULL);
 }
 
 /*
@@ -1006,12 +1065,13 @@ const char *a_UIcmd_select_file()
  */
 void a_UIcmd_stop(void *vbw)
 {
-   BrowserWindow *bw = (BrowserWindow *)vbw;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
 
-   MSG("a_UIcmd_stop()\n");
-   a_Nav_cancel_expect(bw);
-   a_Bw_stop_clients(bw, BW_Root + BW_Img + BW_Force);
-   a_UIcmd_set_buttons_sens(bw);
+  MSG("a_UIcmd_stop()\n");
+  a_Nav_cancel_expect(bw);
+  a_Bw_stop_clients(bw, BW_Root + BW_Img + BW_Force);
+  a_UIcmd_set_buttons_sens(bw);
 }
 
 /*
@@ -1019,7 +1079,8 @@ void a_UIcmd_stop(void *vbw)
  */
 void a_UIcmd_tools(void *vbw, int x, int y)
 {
-   a_Menu_tools_popup((BrowserWindow*)vbw, x, y);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Menu_tools_popup((BrowserWindow *)vbw, x, y);
 }
 
 /*
@@ -1027,16 +1088,17 @@ void a_UIcmd_tools(void *vbw, int x, int y)
  */
 void a_UIcmd_open_file(void *vbw)
 {
-   char *name;
-   DilloUrl *url;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *name;
+  DilloUrl *url;
 
-   name = a_Dialog_open_file("Dillo: Open File", NULL, "");
+  name = a_Dialog_open_file("Dillo: Open File", NULL, "");
 
-   if (name) {
-      url = a_Url_new(name, "file:");
-      a_UIcmd_open_url((BrowserWindow*)vbw, url);
-      a_Url_free(url);
-      dFree(name);
+  if (name) {
+    url = a_Url_new(name, "file:");
+    a_UIcmd_open_url((BrowserWindow *)vbw, url);
+    a_Url_free(url);
+    dFree(name);
    }
 }
 
@@ -1047,28 +1109,33 @@ void a_UIcmd_open_file(void *vbw)
  */
 static char *UIcmd_make_search_str(const char *str)
 {
-   char *search_url, *l, *u, *c;
-   char *keys = a_Url_encode_hex_str(str),
-        *src = (char*)dList_nth_data(prefs.search_urls, prefs.search_url_idx);
-   Dstr *ds = dStr_sized_new(128);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *search_url, *l, *u, *c;
+  char *keys = a_Url_encode_hex_str(str),
+       *src = (char *)dList_nth_data(prefs.search_urls, prefs.search_url_idx);
+  Dstr *ds = dStr_sized_new(128);
 
-   /* parse search_url into label and url */
-   if (a_Misc_parse_search_url(src, &l, &u) == 0) {
-      for (c = u; *c; c++) {
-         if (*c == '%')
-            switch(*++c) {
-            case 's':
-               dStr_append(ds, keys); break;
-            case '%':
-               dStr_append_c(ds, '%'); break;
-            case 0:
-               MSG_WARN("search_url ends with '%%'\n"); c--; break;
-            default:
-               MSG_WARN("illegal specifier '%%%c' in search_url\n", *c);
-            }
-         else
-            dStr_append_c(ds, *c);
-      }
+  /* parse search_url into label and url */
+  if (a_Misc_parse_search_url(src, &l, &u) == 0) {
+    for (c = u; *c; c++) {
+      if (*c == '%')
+        switch (*++c) {
+        case 's':
+          dStr_append(ds, keys);
+          break;
+        case '%':
+          dStr_append_c(ds, '%');
+          break;
+        case 0:
+          MSG_WARN("search_url ends with '%%'\n");
+          c--;
+          break;
+        default:
+          MSG_WARN("illegal specifier '%%%c' in search_url\n", *c);
+        }
+      else
+        dStr_append_c(ds, *c);
+    }
    }
    dFree(keys);
 
@@ -1082,12 +1149,13 @@ static char *UIcmd_make_search_str(const char *str)
  */
 void a_UIcmd_search_dialog(void *vbw)
 {
-   const char *query;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const char *query;
 
-   if ((query = a_Dialog_input("Dillo: Search", "Search the Web:"))) {
-      char *url_str = UIcmd_make_search_str(query);
-      a_UIcmd_open_urlstr(vbw, url_str);
-      dFree(url_str);
+  if ((query = a_Dialog_input("Dillo: Search", "Search the Web:"))) {
+    char *url_str = UIcmd_make_search_str(query);
+    a_UIcmd_open_urlstr(vbw, url_str);
+    dFree(url_str);
    }
 }
 
@@ -1096,12 +1164,13 @@ void a_UIcmd_search_dialog(void *vbw)
  */
 const char *a_UIcmd_get_passwd(const char *user)
 {
-   const char *passwd;
-   const char *title = "Dillo: Password";
-   char *msg = dStrconcat("Password for user \"", user, "\"", NULL);
-   passwd = a_Dialog_passwd(title, msg);
-   dFree(msg);
-   return passwd;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const char *passwd;
+  const char *title = "Dillo: Password";
+  char *msg = dStrconcat("Password for user \"", user, "\"", NULL);
+  passwd = a_Dialog_passwd(title, msg);
+  dFree(msg);
+  return passwd;
 }
 
 /*
@@ -1109,7 +1178,8 @@ const char *a_UIcmd_get_passwd(const char *user)
  */
 void a_UIcmd_save_link(BrowserWindow *bw, const DilloUrl *url)
 {
-   UIcmd_save(bw, url, "Dillo: Save Link as File");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  UIcmd_save(bw, url, "Dillo: Save Link as File");
 }
 
 /*
@@ -1117,9 +1187,10 @@ void a_UIcmd_save_link(BrowserWindow *bw, const DilloUrl *url)
  */
 void a_UIcmd_book(void *vbw)
 {
-   DilloUrl *url = a_Url_new("dpi:/bm/", NULL);
-   a_UIcmd_open_url((BrowserWindow*)vbw, url);
-   a_Url_free(url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloUrl *url = a_Url_new("dpi:/bm/", NULL);
+  a_UIcmd_open_url((BrowserWindow *)vbw, url);
+  a_Url_free(url);
 }
 
 /*
@@ -1127,7 +1198,8 @@ void a_UIcmd_book(void *vbw)
  */
 void a_UIcmd_add_bookmark(BrowserWindow *bw, const DilloUrl *url)
 {
-   a_Bookmarks_add(bw, url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Bookmarks_add(bw, url);
 }
 
 
@@ -1136,9 +1208,10 @@ void a_UIcmd_add_bookmark(BrowserWindow *bw, const DilloUrl *url)
  */
 void a_UIcmd_page_popup(void *vbw, bool_t has_bugs, void *v_cssUrls)
 {
-   BrowserWindow *bw = (BrowserWindow*)vbw;
-   const DilloUrl *url = a_History_get_url(NAV_TOP_UIDX(bw));
-   a_Menu_page_popup(bw, url, has_bugs, v_cssUrls);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
+  const DilloUrl *url = a_History_get_url(NAV_TOP_UIDX(bw));
+  a_Menu_page_popup(bw, url, has_bugs, v_cssUrls);
 }
 
 /*
@@ -1146,7 +1219,8 @@ void a_UIcmd_page_popup(void *vbw, bool_t has_bugs, void *v_cssUrls)
  */
 void a_UIcmd_link_popup(void *vbw, const DilloUrl *url)
 {
-   a_Menu_link_popup((BrowserWindow*)vbw, url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Menu_link_popup((BrowserWindow *)vbw, url);
 }
 
 /*
@@ -1155,7 +1229,8 @@ void a_UIcmd_link_popup(void *vbw, const DilloUrl *url)
 void a_UIcmd_image_popup(void *vbw, const DilloUrl *url, bool_t loaded_img,
                          DilloUrl *page_url, DilloUrl *link_url)
 {
-   a_Menu_image_popup((BrowserWindow*)vbw, url, loaded_img, page_url,link_url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Menu_image_popup((BrowserWindow *)vbw, url, loaded_img, page_url, link_url);
 }
 
 /*
@@ -1164,7 +1239,8 @@ void a_UIcmd_image_popup(void *vbw, const DilloUrl *url, bool_t loaded_img,
 void a_UIcmd_form_popup(void *vbw, const DilloUrl *url, void *vform,
                         bool_t showing_hiddens)
 {
-   a_Menu_form_popup((BrowserWindow*)vbw, url, vform, showing_hiddens);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Menu_form_popup((BrowserWindow *)vbw, url, vform, showing_hiddens);
 }
 
 /*
@@ -1172,7 +1248,8 @@ void a_UIcmd_form_popup(void *vbw, const DilloUrl *url, void *vform,
  */
 void a_UIcmd_file_popup(void *vbw, void *v_wid)
 {
-   a_Menu_file_popup((BrowserWindow*)vbw, v_wid);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Menu_file_popup((BrowserWindow *)vbw, v_wid);
 }
 
 /*
@@ -1180,8 +1257,9 @@ void a_UIcmd_file_popup(void *vbw, void *v_wid)
  */
 void a_UIcmd_copy_urlstr(BrowserWindow *bw, const char *urlstr)
 {
-   Layout *layout = (Layout*)bw->render_layout;
-   layout->copySelection(urlstr);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Layout *layout = (Layout *)bw->render_layout;
+  layout->copySelection(urlstr);
 }
 
 /*
@@ -1189,32 +1267,33 @@ void a_UIcmd_copy_urlstr(BrowserWindow *bw, const char *urlstr)
  */
 void a_UIcmd_view_page_source(BrowserWindow *bw, const DilloUrl *url)
 {
-   char *buf, *major;
-   int buf_size;
-   Dstr *dstr_url;
-   DilloUrl *vs_url;
-   static int post_id = 0;
-   char tag[8];
-   const char *content_type = a_Nav_get_content_type(url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *buf, *major;
+  int buf_size;
+  Dstr *dstr_url;
+  DilloUrl *vs_url;
+  static int post_id = 0;
+  char tag[8];
+  const char *content_type = a_Nav_get_content_type(url);
 
-   a_Misc_parse_content_type(content_type, &major, NULL, NULL);
+  a_Misc_parse_content_type(content_type, &major, NULL, NULL);
 
-   if (major && dStrAsciiCasecmp(major, "image") &&
-       a_Nav_get_buf(url, &buf, &buf_size)) {
-      a_Nav_set_vsource_url(url);
-      dstr_url = dStr_new("dpi:/vsource/:");
-      dStr_append(dstr_url, URL_STR(url));
-      if (URL_FLAGS(url) & URL_Post) {
-         /* append a custom string to differentiate POST URLs */
-         post_id = (post_id < 9999) ? post_id + 1 : 0;
-         snprintf(tag, 8, "_%.4d", post_id);
-         dStr_append(dstr_url, tag);
-      }
-      vs_url = a_Url_new(dstr_url->str, NULL);
-      a_UIcmd_open_url_nt(bw, vs_url, 1);
-      a_Url_free(vs_url);
-      dStr_free(dstr_url, 1);
-      a_Nav_unref_buf(url);
+  if (major && dStrAsciiCasecmp(major, "image") &&
+      a_Nav_get_buf(url, &buf, &buf_size)) {
+    a_Nav_set_vsource_url(url);
+    dstr_url = dStr_new("dpi:/vsource/:");
+    dStr_append(dstr_url, URL_STR(url));
+    if (URL_FLAGS(url) & URL_Post) {
+      /* append a custom string to differentiate POST URLs */
+      post_id = (post_id < 9999) ? post_id + 1 : 0;
+      snprintf(tag, 8, "_%.4d", post_id);
+      dStr_append(dstr_url, tag);
+    }
+    vs_url = a_Url_new(dstr_url->str, NULL);
+    a_UIcmd_open_url_nt(bw, vs_url, 1);
+    a_Url_free(vs_url);
+    dStr_free(dstr_url, 1);
+    a_Nav_unref_buf(url);
    }
    dFree(major);
 }
@@ -1224,10 +1303,11 @@ void a_UIcmd_view_page_source(BrowserWindow *bw, const DilloUrl *url)
  */
 void a_UIcmd_view_page_bugs(void *vbw)
 {
-   BrowserWindow *bw = (BrowserWindow*)vbw;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
 
-   if (bw->num_page_bugs > 0) {
-      a_Dialog_text_window("Dillo: Detected HTML errors", bw->page_bugs->str);
+  if (bw->num_page_bugs > 0) {
+    a_Dialog_text_window("Dillo: Detected HTML errors", bw->page_bugs->str);
    } else {
       a_Dialog_msg("Dillo: Valid HTML!", "Zero detected HTML errors!");
    }
@@ -1238,9 +1318,10 @@ void a_UIcmd_view_page_bugs(void *vbw)
  */
 void a_UIcmd_bugmeter_popup(void *vbw)
 {
-   BrowserWindow *bw = (BrowserWindow*)vbw;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
 
-   a_Menu_bugmeter_popup(bw, a_History_get_url(NAV_TOP_UIDX(bw)));
+  a_Menu_bugmeter_popup(bw, a_History_get_url(NAV_TOP_UIDX(bw)));
 }
 
 /*
@@ -1249,19 +1330,20 @@ void a_UIcmd_bugmeter_popup(void *vbw)
  */
 int *a_UIcmd_get_history(BrowserWindow *bw, int direction)
 {
-   int i, j, n;
-   int *hlist;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i, j, n;
+  int *hlist;
 
-   // Count the number of URLs
-   i = a_Nav_stack_ptr(bw) + direction;
-   for (n = 0 ; i >= 0 && i < a_Nav_stack_size(bw); i+=direction)
-      ++n;
-   hlist = dNew(int, n + 1);
+  // Count the number of URLs
+  i = a_Nav_stack_ptr(bw) + direction;
+  for (n = 0; i >= 0 && i < a_Nav_stack_size(bw); i += direction)
+    ++n;
+  hlist = dNew(int, n + 1);
 
-   // Fill the list
-   i = a_Nav_stack_ptr(bw) + direction;
-   for (j = 0 ; i >= 0 && i < a_Nav_stack_size(bw); i+=direction, j += 1) {
-      hlist[j] = NAV_UIDX(bw,i);
+  // Fill the list
+  i = a_Nav_stack_ptr(bw) + direction;
+  for (j = 0; i >= 0 && i < a_Nav_stack_size(bw); i += direction, j += 1) {
+    hlist[j] = NAV_UIDX(bw, i);
    }
    hlist[j] = -1;
 
@@ -1273,7 +1355,8 @@ int *a_UIcmd_get_history(BrowserWindow *bw, int direction)
  */
 void a_UIcmd_nav_jump(BrowserWindow *bw, int offset, int new_bw)
 {
-   a_Nav_jump(bw, offset, new_bw);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Nav_jump(bw, offset, new_bw);
 }
 
 // UI binding functions -------------------------------------------------------
@@ -1283,9 +1366,10 @@ void a_UIcmd_nav_jump(BrowserWindow *bw, int offset, int new_bw)
  */
 void a_UIcmd_get_wh(BrowserWindow *bw, int *w, int *h)
 {
-   *w = BW2UI(bw)->w();
-   *h = BW2UI(bw)->h();
-   _MSG("a_UIcmd_wh: w=%d, h=%d\n", *w, *h);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  *w = BW2UI(bw)->w();
+  *h = BW2UI(bw)->h();
+  _MSG("a_UIcmd_wh: w=%d, h=%d\n", *w, *h);
 }
 
 /*
@@ -1293,11 +1377,12 @@ void a_UIcmd_get_wh(BrowserWindow *bw, int *w, int *h)
  */
 void a_UIcmd_get_scroll_xy(BrowserWindow *bw, int *x, int *y)
 {
-   Layout *layout = (Layout*)bw->render_layout;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Layout *layout = (Layout *)bw->render_layout;
 
-   if (layout) {
-     *x = layout->getScrollPosX();
-     *y = layout->getScrollPosY();
+  if (layout) {
+    *x = layout->getScrollPosX();
+    *y = layout->getScrollPosY();
    }
 }
 
@@ -1306,10 +1391,11 @@ void a_UIcmd_get_scroll_xy(BrowserWindow *bw, int *x, int *y)
  */
 void a_UIcmd_set_scroll_xy(BrowserWindow *bw, int x, int y)
 {
-   Layout *layout = (Layout*)bw->render_layout;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Layout *layout = (Layout *)bw->render_layout;
 
-   if (layout) {
-      layout->scrollTo(HPOS_LEFT, VPOS_TOP, x, y, 0, 0);
+  if (layout) {
+    layout->scrollTo(HPOS_LEFT, VPOS_TOP, x, y, 0, 0);
    }
 }
 
@@ -1318,10 +1404,11 @@ void a_UIcmd_set_scroll_xy(BrowserWindow *bw, int x, int y)
  */
 void a_UIcmd_set_scroll_by_fragment(BrowserWindow *bw, const char *f)
 {
-   Layout *layout = (Layout*)bw->render_layout;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Layout *layout = (Layout *)bw->render_layout;
 
-   if (layout && f) {
-      layout->setAnchor(f);
+  if (layout && f) {
+    layout->setAnchor(f);
    }
 }
 
@@ -1330,34 +1417,35 @@ void a_UIcmd_set_scroll_by_fragment(BrowserWindow *bw, const char *f)
  */
 void a_UIcmd_scroll(BrowserWindow *bw, int icmd)
 {
-   Layout *layout = (Layout*)bw->render_layout;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Layout *layout = (Layout *)bw->render_layout;
 
-   if (layout) {
-      typedef struct {
-         KeysCommand_t keys_cmd;
-         ScrollCommand dw_cmd;
-      } mapping_t;
+  if (layout) {
+    typedef struct {
+      KeysCommand_t keys_cmd;
+      ScrollCommand dw_cmd;
+    } mapping_t;
 
-      const mapping_t map[] = {
-         {KEYS_SCREEN_UP, SCREEN_UP_CMD},
-         {KEYS_SCREEN_DOWN, SCREEN_DOWN_CMD},
-         {KEYS_SCREEN_LEFT, SCREEN_LEFT_CMD},
-         {KEYS_SCREEN_RIGHT, SCREEN_RIGHT_CMD},
-         {KEYS_LINE_UP, LINE_UP_CMD},
-         {KEYS_LINE_DOWN, LINE_DOWN_CMD},
-         {KEYS_LEFT, LEFT_CMD},
-         {KEYS_RIGHT, RIGHT_CMD},
-         {KEYS_TOP, TOP_CMD},
-         {KEYS_BOTTOM, BOTTOM_CMD},
-      };
-      KeysCommand_t keycmd = (KeysCommand_t)icmd;
+    const mapping_t map[] = {
+        {KEYS_SCREEN_UP, SCREEN_UP_CMD},
+        {KEYS_SCREEN_DOWN, SCREEN_DOWN_CMD},
+        {KEYS_SCREEN_LEFT, SCREEN_LEFT_CMD},
+        {KEYS_SCREEN_RIGHT, SCREEN_RIGHT_CMD},
+        {KEYS_LINE_UP, LINE_UP_CMD},
+        {KEYS_LINE_DOWN, LINE_DOWN_CMD},
+        {KEYS_LEFT, LEFT_CMD},
+        {KEYS_RIGHT, RIGHT_CMD},
+        {KEYS_TOP, TOP_CMD},
+        {KEYS_BOTTOM, BOTTOM_CMD},
+    };
+    KeysCommand_t keycmd = (KeysCommand_t)icmd;
 
-      for (uint_t i = 0; i < sizeof(map) / sizeof(map[0]); i++) {
-         if (keycmd == map[i].keys_cmd) {
-            layout->scroll(map[i].dw_cmd);
-            break;
-         }
+    for (uint_t i = 0; i < sizeof(map) / sizeof(map[0]); i++) {
+      if (keycmd == map[i].keys_cmd) {
+        layout->scroll(map[i].dw_cmd);
+        break;
       }
+    }
    }
 }
 
@@ -1366,7 +1454,8 @@ void a_UIcmd_scroll(BrowserWindow *bw, int icmd)
  */
 char *a_UIcmd_get_location_text(BrowserWindow *bw)
 {
-   return dStrdup(BW2UI(bw)->get_location());
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return dStrdup(BW2UI(bw)->get_location());
 }
 
 /*
@@ -1374,8 +1463,9 @@ char *a_UIcmd_get_location_text(BrowserWindow *bw)
  */
 void a_UIcmd_set_location_text(void *vbw, const char *text)
 {
-   BrowserWindow *bw = (BrowserWindow*)vbw;
-   BW2UI(bw)->set_location(text);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
+  BW2UI(bw)->set_location(text);
 }
 
 /*
@@ -1384,7 +1474,8 @@ void a_UIcmd_set_location_text(void *vbw, const char *text)
  */
 void a_UIcmd_set_page_prog(BrowserWindow *bw, size_t nbytes, int cmd)
 {
-   BW2UI(bw)->set_page_prog(nbytes, cmd);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BW2UI(bw)->set_page_prog(nbytes, cmd);
 }
 
 /*
@@ -1393,7 +1484,8 @@ void a_UIcmd_set_page_prog(BrowserWindow *bw, size_t nbytes, int cmd)
  */
 void a_UIcmd_set_img_prog(BrowserWindow *bw, int n_img, int t_img, int cmd)
 {
-   BW2UI(bw)->set_img_prog(n_img, t_img, cmd);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BW2UI(bw)->set_img_prog(n_img, t_img, cmd);
 #if 0
    if (!cmd)
       a_UIcmd_close_bw(bw);
@@ -1403,9 +1495,9 @@ void a_UIcmd_set_img_prog(BrowserWindow *bw, int n_img, int t_img, int cmd)
 /*
  * Set the bug meter progress label
  */
-void a_UIcmd_set_bug_prog(BrowserWindow *bw, int n_bug)
-{
-   BW2UI(bw)->set_bug_prog(n_bug);
+void a_UIcmd_set_bug_prog(BrowserWindow *bw, int n_bug) {
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BW2UI(bw)->set_bug_prog(n_bug);
 }
 
 /*
@@ -1414,12 +1506,13 @@ void a_UIcmd_set_bug_prog(BrowserWindow *bw, int n_bug)
  */
 void a_UIcmd_set_page_title(BrowserWindow *bw, const char *label)
 {
-   const int size = 128;
-   char title[size];
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const int size = 128;
+  char title[size];
 
-   if (snprintf(title, size, "Dillo: %s", label ? label : "") >= size) {
-      uint_t i = MIN(size - 4, 1 + a_Utf8_end_of_char(title, size - 8));
-      snprintf(title + i, 4, "...");
+  if (snprintf(title, size, "Dillo: %s", label ? label : "") >= size) {
+    uint_t i = MIN(size - 4, 1 + a_Utf8_end_of_char(title, size - 8));
+    snprintf(title + i, 4, "...");
    }
    BW2UI(bw)->copy_label(title);
    BW2UI(bw)->tabs()->set_tab_label(BW2UI(bw), label ? label : "");
@@ -1437,13 +1530,14 @@ void a_UIcmd_set_page_title(BrowserWindow *bw, const char *label)
  */
 void a_UIcmd_set_msg(BrowserWindow *bw, const char *format, ...)
 {
-   va_list argp;
-   Dstr *ds = dStr_sized_new(128);
-   va_start(argp, format);
-   dStr_vsprintf(ds, format, argp);
-   va_end(argp);
-   BW2UI(bw)->set_status(ds->str);
-   dStr_free(ds, 1);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  va_list argp;
+  Dstr *ds = dStr_sized_new(128);
+  va_start(argp, format);
+  dStr_vsprintf(ds, format, argp);
+  va_end(argp);
+  BW2UI(bw)->set_status(ds->str);
+  dStr_free(ds, 1);
 }
 
 /*
@@ -1451,18 +1545,19 @@ void a_UIcmd_set_msg(BrowserWindow *bw, const char *format, ...)
  */
 void a_UIcmd_set_buttons_sens(BrowserWindow *bw)
 {
-   int sens;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int sens;
 
-   // Stop
-   sens = (dList_length(bw->ImageClients) || dList_length(bw->RootClients));
-   BW2UI(bw)->button_set_sens(UI_STOP, sens);
-   // Back
-   sens = (a_Nav_stack_ptr(bw) > 0);
-   BW2UI(bw)->button_set_sens(UI_BACK, sens);
-   // Forward
-   sens = (a_Nav_stack_ptr(bw) < a_Nav_stack_size(bw) - 1 &&
-           !a_Bw_expecting(bw));
-   BW2UI(bw)->button_set_sens(UI_FORW, sens);
+  // Stop
+  sens = (dList_length(bw->ImageClients) || dList_length(bw->RootClients));
+  BW2UI(bw)->button_set_sens(UI_STOP, sens);
+  // Back
+  sens = (a_Nav_stack_ptr(bw) > 0);
+  BW2UI(bw)->button_set_sens(UI_BACK, sens);
+  // Forward
+  sens =
+      (a_Nav_stack_ptr(bw) < a_Nav_stack_size(bw) - 1 && !a_Bw_expecting(bw));
+  BW2UI(bw)->button_set_sens(UI_FORW, sens);
 }
 
 /*
@@ -1470,7 +1565,8 @@ void a_UIcmd_set_buttons_sens(BrowserWindow *bw)
  */
 void a_UIcmd_panels_toggle(BrowserWindow *bw)
 {
-   BW2UI(bw)->panels_toggle();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BW2UI(bw)->panels_toggle();
 }
 
 /*
@@ -1479,19 +1575,20 @@ void a_UIcmd_panels_toggle(BrowserWindow *bw)
 void a_UIcmd_findtext_search(BrowserWindow *bw, const char *key,
                              int case_sens, int backward)
 {
-   Layout *l = (Layout *)bw->render_layout;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Layout *l = (Layout *)bw->render_layout;
 
-   switch (l->search(key, case_sens, backward)) {
-   case FindtextState::RESTART:
-      a_UIcmd_set_msg(bw, backward?"Top reached; restarting from the bottom."
-                                  :"Bottom reached; restarting from the top.");
-      break;
-   case FindtextState::NOT_FOUND:
-      a_UIcmd_set_msg(bw, "\"%s\" not found.", key);
-      break;
-   case FindtextState::SUCCESS:
-   default:
-      a_UIcmd_set_msg(bw, "");
+  switch (l->search(key, case_sens, backward)) {
+  case FindtextState::RESTART:
+    a_UIcmd_set_msg(bw, backward ? "Top reached; restarting from the bottom."
+                                 : "Bottom reached; restarting from the top.");
+    break;
+  case FindtextState::NOT_FOUND:
+    a_UIcmd_set_msg(bw, "\"%s\" not found.", key);
+    break;
+  case FindtextState::SUCCESS:
+  default:
+    a_UIcmd_set_msg(bw, "");
    }
 }
 
@@ -1500,10 +1597,11 @@ void a_UIcmd_findtext_search(BrowserWindow *bw, const char *key,
  */
 void a_UIcmd_findtext_reset(BrowserWindow *bw)
 {
-   Layout *l = (Layout *)bw->render_layout;
-   l->resetSearch();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Layout *l = (Layout *)bw->render_layout;
+  l->resetSearch();
 
-   a_UIcmd_set_msg(bw, "");
+  a_UIcmd_set_msg(bw, "");
 }
 
 /*
@@ -1511,7 +1609,8 @@ void a_UIcmd_findtext_reset(BrowserWindow *bw)
  */
 void a_UIcmd_findbar_toggle(BrowserWindow *bw, int on)
 {
-   BW2UI(bw)->findbar_toggle(on);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BW2UI(bw)->findbar_toggle(on);
 }
 
 /*
@@ -1519,7 +1618,8 @@ void a_UIcmd_findbar_toggle(BrowserWindow *bw, int on)
  */
 void a_UIcmd_focus_main_area(BrowserWindow *bw)
 {
-   BW2UI(bw)->focus_main();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BW2UI(bw)->focus_main();
 }
 
 /*
@@ -1527,7 +1627,8 @@ void a_UIcmd_focus_main_area(BrowserWindow *bw)
  */
 void a_UIcmd_focus_location(void *vbw)
 {
-   BrowserWindow *bw = (BrowserWindow*)vbw;
-   BW2UI(bw)->focus_location();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  BrowserWindow *bw = (BrowserWindow *)vbw;
+  BW2UI(bw)->focus_location();
 }
 

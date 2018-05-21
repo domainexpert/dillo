@@ -147,19 +147,20 @@ static Dlist *bindings;
  */
 void Keys::init()
 {
-   KeyBinding_t *node;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  KeyBinding_t *node;
 
-   // Fill our key bindings list
-   bindings = dList_new(32);
-   for (uint_t i = 0; i < sizeof(default_keys) / sizeof(default_keys[0]); i++) {
-      if (default_keys[i].key) {
-         node = dNew(KeyBinding_t, 1);
-         node->name = dStrdup(default_keys[i].name);
-         node->cmd = default_keys[i].cmd;
-         node->modifier = default_keys[i].modifier;
-         node->key = default_keys[i].key;
-         dList_insert_sorted(bindings, node, nodeByKeyCmp);
-      }
+  // Fill our key bindings list
+  bindings = dList_new(32);
+  for (uint_t i = 0; i < sizeof(default_keys) / sizeof(default_keys[0]); i++) {
+    if (default_keys[i].key) {
+      node = dNew(KeyBinding_t, 1);
+      node->name = dStrdup(default_keys[i].name);
+      node->cmd = default_keys[i].cmd;
+      node->modifier = default_keys[i].modifier;
+      node->key = default_keys[i].key;
+      dList_insert_sorted(bindings, node, nodeByKeyCmp);
+    }
    }
 }
 
@@ -168,12 +169,13 @@ void Keys::init()
  */
 void Keys::free()
 {
-   KeyBinding_t *node;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  KeyBinding_t *node;
 
-   while ((node = (KeyBinding_t*)dList_nth_data(bindings, 0))) {
-      dFree((char*)node->name);
-      dList_remove_fast(bindings, node);
-      dFree(node);
+  while ((node = (KeyBinding_t *)dList_nth_data(bindings, 0))) {
+    dFree((char *)node->name);
+    dList_remove_fast(bindings, node);
+    dFree(node);
    }
    dList_free(bindings);
 }
@@ -183,9 +185,10 @@ void Keys::free()
  */
 int Keys::nodeByKeyCmp(const void *node, const void *key)
 {
-   KeyBinding_t *n = (KeyBinding_t*)node, *k = (KeyBinding_t*)key;
-   _MSG("Keys::nodeByKeyCmp modifier=%d\n", k->modifier);
-   return (n->key != k->key) ? (n->key - k->key) : (n->modifier - k->modifier);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  KeyBinding_t *n = (KeyBinding_t *)node, *k = (KeyBinding_t *)key;
+  _MSG("Keys::nodeByKeyCmp modifier=%d\n", k->modifier);
+  return (n->key != k->key) ? (n->key - k->key) : (n->modifier - k->modifier);
 }
 
 /*
@@ -194,12 +197,14 @@ int Keys::nodeByKeyCmp(const void *node, const void *key)
  */
 KeysCommand_t Keys::getKeyCmd()
 {
-   KeysCommand_t ret = KEYS_NOP;
-   KeyBinding_t keyNode;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  KeysCommand_t ret = KEYS_NOP;
+  KeyBinding_t keyNode;
 
-   keyNode.modifier = Fl::event_state() & (FL_SHIFT | FL_CTRL |FL_ALT|FL_META);
-   if (iscntrl(Fl::event_text()[0])) {
-      keyNode.key = Fl::event_key();
+  keyNode.modifier =
+      Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT | FL_META);
+  if (iscntrl(Fl::event_text()[0])) {
+    keyNode.key = Fl::event_key();
    } else {
       const char *beyond = Fl::event_text() + Fl::event_length();
       keyNode.key = a_Utf8_decode(Fl::event_text(), beyond, NULL);
@@ -226,15 +231,16 @@ KeysCommand_t Keys::getKeyCmd()
  */
 void Keys::delKeyCmd(int key, int mod)
 {
-   KeyBinding_t keyNode, *node;
-   keyNode.key = key;
-   keyNode.modifier = mod;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  KeyBinding_t keyNode, *node;
+  keyNode.key = key;
+  keyNode.modifier = mod;
 
-   node = (KeyBinding_t*) dList_find_sorted(bindings, &keyNode, nodeByKeyCmp);
-   if (node) {
-      dList_remove(bindings, node);
-      dFree((char*)node->name);
-      dFree(node);
+  node = (KeyBinding_t *)dList_find_sorted(bindings, &keyNode, nodeByKeyCmp);
+  if (node) {
+    dList_remove(bindings, node);
+    dFree((char *)node->name);
+    dFree(node);
    }
 }
 
@@ -245,11 +251,12 @@ void Keys::delKeyCmd(int key, int mod)
  */
 int Keys::getKeyCode(char *keyName)
 {
-   uint_t i;
-   for (i = 0; i < sizeof(keyNames) / sizeof(keyNames[0]); i++) {
-      if (!dStrAsciiCasecmp(keyNames[i].name, keyName)) {
-         return keyNames[i].value;
-      }
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  uint_t i;
+  for (i = 0; i < sizeof(keyNames) / sizeof(keyNames[0]); i++) {
+    if (!dStrAsciiCasecmp(keyNames[i].name, keyName)) {
+      return keyNames[i].value;
+    }
    }
 
    return -1;
@@ -261,11 +268,12 @@ int Keys::getKeyCode(char *keyName)
  */
 KeysCommand_t Keys::getCmdCode(const char *commandName)
 {
-   uint_t i;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  uint_t i;
 
-   for (i = 0; i < sizeof(default_keys) / sizeof(KeyBinding_t); i++) {
-      if (!dStrAsciiCasecmp(default_keys[i].name, commandName))
-         return default_keys[i].cmd;
+  for (i = 0; i < sizeof(default_keys) / sizeof(KeyBinding_t); i++) {
+    if (!dStrAsciiCasecmp(default_keys[i].name, commandName))
+      return default_keys[i].cmd;
    }
    return KEYS_INVALID;
 }
@@ -276,11 +284,12 @@ KeysCommand_t Keys::getCmdCode(const char *commandName)
  */
 int Keys::getModifier(char *modifierName)
 {
-   uint_t i;
-   for (i = 0; i < sizeof(modifierNames) / sizeof(modifierNames[0]); i++) {
-      if (!dStrAsciiCasecmp(modifierNames[i].name, modifierName)) {
-         return modifierNames[i].value;
-      }
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  uint_t i;
+  for (i = 0; i < sizeof(modifierNames) / sizeof(modifierNames[0]); i++) {
+    if (!dStrAsciiCasecmp(modifierNames[i].name, modifierName)) {
+      return modifierNames[i].value;
+    }
    }
 
    return -1;
@@ -292,12 +301,13 @@ int Keys::getModifier(char *modifierName)
  */
 int Keys::getShortcut(KeysCommand_t cmd)
 {
-   int len = dList_length(bindings);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int len = dList_length(bindings);
 
-   for (int i = 0; i < len; i++) {
-      KeyBinding_t *node = (KeyBinding_t*)dList_nth_data(bindings, i);
-      if (cmd == node->cmd)
-         return node->modifier + node->key;
+  for (int i = 0; i < len; i++) {
+    KeyBinding_t *node = (KeyBinding_t *)dList_nth_data(bindings, i);
+    if (cmd == node->cmd)
+      return node->modifier + node->key;
    }
    return 0;
 }
@@ -308,16 +318,17 @@ int Keys::getShortcut(KeysCommand_t cmd)
  */
 void Keys::parseKey(char *key, char *commandName)
 {
-   char *p, *modstr, *keystr;
-   KeysCommand_t symcode;
-   int st, keymod = 0, keycode = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *p, *modstr, *keystr;
+  KeysCommand_t symcode;
+  int st, keymod = 0, keycode = 0;
 
-   _MSG("Keys::parseKey key='%s' commandName='%s'\n", key, commandName);
+  _MSG("Keys::parseKey key='%s' commandName='%s'\n", key, commandName);
 
-   // Get command code
-   if ((symcode = getCmdCode(commandName)) == KEYS_INVALID) {
-      MSG("Keys::parseKey: Invalid command name: '%s'\n", commandName);
-      return;
+  // Get command code
+  if ((symcode = getCmdCode(commandName)) == KEYS_INVALID) {
+    MSG("Keys::parseKey: Invalid command name: '%s'\n", commandName);
+    return;
    }
 
    // Skip space
@@ -373,23 +384,25 @@ void Keys::parseKey(char *key, char *commandName)
  */
 void Keys::parse(FILE *fp)
 {
-   char *line, *keycomb, *command;
-   int st, lineno = 1;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *line, *keycomb, *command;
+  int st, lineno = 1;
 
-   // scan the file line by line
-   while ((line = dGetline(fp)) != NULL) {
-      st = dParser_parse_rc_line(&line, &keycomb, &command);
+  // scan the file line by line
+  while ((line = dGetline(fp)) != NULL) {
+    st = dParser_parse_rc_line(&line, &keycomb, &command);
 
-      if (st == 0) {
-         _MSG("Keys::parse: keycomb=%s, command=%s\n", keycomb, command);
-         parseKey(keycomb, command);
-      } else if (st < 0) {
-         MSG("Keys::parse: Syntax error in keysrc line %d: "
-             "keycomb=\"%s\" command=\"%s\"\n", lineno, keycomb, command);
-      }
+    if (st == 0) {
+      _MSG("Keys::parse: keycomb=%s, command=%s\n", keycomb, command);
+      parseKey(keycomb, command);
+    } else if (st < 0) {
+      MSG("Keys::parse: Syntax error in keysrc line %d: "
+          "keycomb=\"%s\" command=\"%s\"\n",
+          lineno, keycomb, command);
+    }
 
-      dFree(line);
-      ++lineno;
+    dFree(line);
+    ++lineno;
    }
    fclose(fp);
 }

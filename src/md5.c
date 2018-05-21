@@ -140,10 +140,10 @@
 static void
 md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
 {
-    md5_word_t
-	a = pms->abcd[0], b = pms->abcd[1],
-	c = pms->abcd[2], d = pms->abcd[3];
-    md5_word_t t;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  md5_word_t a = pms->abcd[0], b = pms->abcd[1], c = pms->abcd[2],
+             d = pms->abcd[3];
+  md5_word_t t;
 #if BYTE_ORDER > 0
     /* Define storage only for big-endian CPUs. */
     md5_word_t X[16];
@@ -321,40 +321,42 @@ md5_process(md5_state_t *pms, const md5_byte_t *data /*[64]*/)
 void
 md5_init(md5_state_t *pms)
 {
-    pms->count[0] = pms->count[1] = 0;
-    pms->abcd[0] = 0x67452301;
-    pms->abcd[1] = /*0xefcdab89*/ T_MASK ^ 0x10325476;
-    pms->abcd[2] = /*0x98badcfe*/ T_MASK ^ 0x67452301;
-    pms->abcd[3] = 0x10325476;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  pms->count[0] = pms->count[1] = 0;
+  pms->abcd[0] = 0x67452301;
+  pms->abcd[1] = /*0xefcdab89*/ T_MASK ^ 0x10325476;
+  pms->abcd[2] = /*0x98badcfe*/ T_MASK ^ 0x67452301;
+  pms->abcd[3] = 0x10325476;
 }
 
 void
 md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
 {
-    const md5_byte_t *p = data;
-    int left = nbytes;
-    int offset = (pms->count[0] >> 3) & 63;
-    md5_word_t nbits = (md5_word_t)(nbytes << 3);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const md5_byte_t *p = data;
+  int left = nbytes;
+  int offset = (pms->count[0] >> 3) & 63;
+  md5_word_t nbits = (md5_word_t)(nbytes << 3);
 
-    if (nbytes <= 0)
-	return;
+  if (nbytes <= 0)
+    return;
 
-    /* Update the message length. */
-    pms->count[1] += nbytes >> 29;
-    pms->count[0] += nbits;
-    if (pms->count[0] < nbits)
-	pms->count[1]++;
+  /* Update the message length. */
+  pms->count[1] += nbytes >> 29;
+  pms->count[0] += nbits;
+  if (pms->count[0] < nbits)
+    pms->count[1]++;
 
-    /* Process an initial partial block. */
-    if (offset) {
-	int copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
+  /* Process an initial partial block. */
+  if (offset) {
+    int copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
 
-	memcpy(pms->buf + offset, p, copy);
-	if (offset + copy < 64)
-	    return;
-	p += copy;
-	left -= copy;
-	md5_process(pms, pms->buf);
+    memcpy(pms->buf + offset, p, copy);
+    if (offset + copy < 64)
+      return;
+    p += copy;
+    left -= copy;
+    md5_process(pms, pms->buf);
     }
 
     /* Process full blocks. */
@@ -369,22 +371,21 @@ md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
 void
 md5_finish(md5_state_t *pms, md5_byte_t digest[16])
 {
-    static const md5_byte_t pad[64] = {
-	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    };
-    md5_byte_t data[8];
-    int i;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  static const md5_byte_t pad[64] = {
+      0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  md5_byte_t data[8];
+  int i;
 
-    /* Save the length before padding. */
-    for (i = 0; i < 8; ++i)
-	data[i] = (md5_byte_t)(pms->count[i >> 2] >> ((i & 3) << 3));
-    /* Pad to 56 bytes mod 64. */
-    md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
-    /* Append the length. */
-    md5_append(pms, data, 8);
-    for (i = 0; i < 16; ++i)
-	digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
+  /* Save the length before padding. */
+  for (i = 0; i < 8; ++i)
+    data[i] = (md5_byte_t)(pms->count[i >> 2] >> ((i & 3) << 3));
+  /* Pad to 56 bytes mod 64. */
+  md5_append(pms, pad, ((55 - (pms->count[0] >> 3)) & 63) + 1);
+  /* Append the length. */
+  md5_append(pms, data, 8);
+  for (i = 0; i < 16; ++i)
+    digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
 }

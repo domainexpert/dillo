@@ -87,13 +87,13 @@ static void Jpeg_write(DilloJpeg *jpeg, void *Buf, uint_t BufSize);
 /* this is the routine called by libjpeg when it detects an error. */
 METHODDEF(void) Jpeg_errorexit (j_common_ptr cinfo)
 {
-   /* display message and return to setjmp buffer */
-   my_error_ptr myerr = (my_error_ptr) cinfo->err;
-   if (prefs.show_msg) {
-      DilloJpeg *jpeg =
-                     ((my_source_mgr *) ((j_decompress_ptr) cinfo)->src)->jpeg;
-      MSG_WARN("\"%s\": ", URL_STR(jpeg->url));
-      (*cinfo->err->output_message) (cinfo);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  /* display message and return to setjmp buffer */
+  my_error_ptr myerr = (my_error_ptr)cinfo->err;
+  if (prefs.show_msg) {
+    DilloJpeg *jpeg = ((my_source_mgr *)((j_decompress_ptr)cinfo)->src)->jpeg;
+    MSG_WARN("\"%s\": ", URL_STR(jpeg->url));
+    (*cinfo->err->output_message)(cinfo);
    }
    longjmp(myerr->setjmp_buffer, 1);
 }
@@ -103,9 +103,10 @@ METHODDEF(void) Jpeg_errorexit (j_common_ptr cinfo)
  */
 static void Jpeg_free(DilloJpeg *jpeg)
 {
-   _MSG("Jpeg_free: jpeg=%p\n", jpeg);
-   jpeg_destroy_decompress(&(jpeg->cinfo));
-   dFree(jpeg);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("Jpeg_free: jpeg=%p\n", jpeg);
+  jpeg_destroy_decompress(&(jpeg->cinfo));
+  dFree(jpeg);
 }
 
 /*
@@ -113,9 +114,10 @@ static void Jpeg_free(DilloJpeg *jpeg)
  */
 static void Jpeg_close(DilloJpeg *jpeg, CacheClient_t *Client)
 {
-   _MSG("Jpeg_close\n");
-   a_Dicache_close(jpeg->url, jpeg->version, Client);
-   Jpeg_free(jpeg);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("Jpeg_close\n");
+  a_Dicache_close(jpeg->url, jpeg->version, Client);
+  Jpeg_free(jpeg);
 }
 
 /*
@@ -123,15 +125,14 @@ static void Jpeg_close(DilloJpeg *jpeg, CacheClient_t *Client)
  *    static void init_source(j_decompress_ptr cinfo)
  * (declaring it with no parameter avoids a compiler warning)
  */
-static void init_source()
-{
-}
+static void init_source() { printf("FUNCTION: %s\n", __PRETTY_FUNCTION__); }
 
 static boolean fill_input_buffer(j_decompress_ptr cinfo)
 {
-   DilloJpeg *jpeg = ((my_source_mgr *) cinfo->src)->jpeg;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloJpeg *jpeg = ((my_source_mgr *)cinfo->src)->jpeg;
 
-   _MSG("fill_input_buffer\n");
+  _MSG("fill_input_buffer\n");
 #if 0
    if (!cinfo->src->bytes_in_buffer) {
       _MSG("fill_input_buffer: %ld bytes in buffer\n",
@@ -156,19 +157,20 @@ static boolean fill_input_buffer(j_decompress_ptr cinfo)
 
 static void skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 {
-   DilloJpeg *jpeg;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloJpeg *jpeg;
 
-   if (num_bytes < 1)
-      return;
-   jpeg = ((my_source_mgr *) cinfo->src)->jpeg;
+  if (num_bytes < 1)
+    return;
+  jpeg = ((my_source_mgr *)cinfo->src)->jpeg;
 
-   _MSG("skip_input_data: Start_Ofs = %lu, num_bytes = %ld,"
-        " %ld bytes in buffer\n",
-        (ulong_t)jpeg->Start_Ofs, num_bytes,(long)cinfo->src->bytes_in_buffer);
+  _MSG("skip_input_data: Start_Ofs = %lu, num_bytes = %ld,"
+       " %ld bytes in buffer\n",
+       (ulong_t)jpeg->Start_Ofs, num_bytes, (long)cinfo->src->bytes_in_buffer);
 
-   cinfo->src->next_input_byte += num_bytes;
-   if (num_bytes < (long)cinfo->src->bytes_in_buffer) {
-      cinfo->src->bytes_in_buffer -= num_bytes;
+  cinfo->src->next_input_byte += num_bytes;
+  if (num_bytes < (long)cinfo->src->bytes_in_buffer) {
+    cinfo->src->bytes_in_buffer -= num_bytes;
    } else {
       jpeg->Skip += num_bytes - cinfo->src->bytes_in_buffer + 1;
       cinfo->src->bytes_in_buffer = 0;
@@ -180,52 +182,52 @@ static void skip_input_data(j_decompress_ptr cinfo, long num_bytes)
  *    static void term_source(j_decompress_ptr cinfo)
  * (declaring it with no parameter avoids a compiler warning)
  */
-static void term_source()
-{
-}
+static void term_source() { printf("FUNCTION: %s\n", __PRETTY_FUNCTION__); }
 
 void *a_Jpeg_new(DilloImage *Image, DilloUrl *url, int version)
 {
-   my_source_mgr *src;
-   DilloJpeg *jpeg = dMalloc(sizeof(*jpeg));
-   _MSG("a_Jpeg_new: jpeg=%p\n", jpeg);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  my_source_mgr *src;
+  DilloJpeg *jpeg = dMalloc(sizeof(*jpeg));
+  _MSG("a_Jpeg_new: jpeg=%p\n", jpeg);
 
-   jpeg->Image = Image;
-   jpeg->url = url;
-   jpeg->version = version;
+  jpeg->Image = Image;
+  jpeg->url = url;
+  jpeg->version = version;
 
-   jpeg->state = DILLO_JPEG_INIT;
-   jpeg->Start_Ofs = 0;
-   jpeg->Skip = 0;
+  jpeg->state = DILLO_JPEG_INIT;
+  jpeg->Start_Ofs = 0;
+  jpeg->Skip = 0;
 
-   /* decompression step 1 (see libjpeg.doc) */
-   jpeg->cinfo.err = jpeg_std_error(&(jpeg->jerr.pub));
-   jpeg->jerr.pub.error_exit = Jpeg_errorexit;
+  /* decompression step 1 (see libjpeg.doc) */
+  jpeg->cinfo.err = jpeg_std_error(&(jpeg->jerr.pub));
+  jpeg->jerr.pub.error_exit = Jpeg_errorexit;
 
-   jpeg_create_decompress(&(jpeg->cinfo));
+  jpeg_create_decompress(&(jpeg->cinfo));
 
-   /* decompression step 2 (see libjpeg.doc) */
-   jpeg->cinfo.src = &jpeg->Src.pub;
-   src = &jpeg->Src;
-   src->pub.init_source = init_source;
-   src->pub.fill_input_buffer = fill_input_buffer;
-   src->pub.skip_input_data = skip_input_data;
-   src->pub.resync_to_restart = jpeg_resync_to_restart;/* use default method */
-   src->pub.term_source = term_source;
-   src->pub.bytes_in_buffer = 0;   /* forces fill_input_buffer on first read */
-   src->pub.next_input_byte = NULL;/* until buffer loaded */
+  /* decompression step 2 (see libjpeg.doc) */
+  jpeg->cinfo.src = &jpeg->Src.pub;
+  src = &jpeg->Src;
+  src->pub.init_source = init_source;
+  src->pub.fill_input_buffer = fill_input_buffer;
+  src->pub.skip_input_data = skip_input_data;
+  src->pub.resync_to_restart = jpeg_resync_to_restart; /* use default method */
+  src->pub.term_source = term_source;
+  src->pub.bytes_in_buffer = 0;    /* forces fill_input_buffer on first read */
+  src->pub.next_input_byte = NULL; /* until buffer loaded */
 
-   src->jpeg = jpeg;
+  src->jpeg = jpeg;
 
-   /* decompression steps continue in write method */
-   return jpeg;
+  /* decompression steps continue in write method */
+  return jpeg;
 }
 
 void a_Jpeg_callback(int Op, void *data)
 {
-   if (Op == CA_Send) {
-      CacheClient_t *Client = data;
-      Jpeg_write(Client->CbData, Client->Buf, Client->BufSize);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (Op == CA_Send) {
+    CacheClient_t *Client = data;
+    Jpeg_write(Client->CbData, Client->Buf, Client->BufSize);
    } else if (Op == CA_Close) {
       CacheClient_t *Client = data;
       Jpeg_close(Client->CbData, Client);
@@ -239,27 +241,28 @@ void a_Jpeg_callback(int Op, void *data)
  */
 static void Jpeg_write(DilloJpeg *jpeg, void *Buf, uint_t BufSize)
 {
-   DilloImgType type;
-   uchar_t *linebuf;
-   JSAMPLE *array[1];
-   int num_read;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloImgType type;
+  uchar_t *linebuf;
+  JSAMPLE *array[1];
+  int num_read;
 
-   _MSG("Jpeg_write: (%p) Bytes in buff: %ld Ofs: %lu\n", jpeg,
-        (long) BufSize, (ulong_t)jpeg->Start_Ofs);
+  _MSG("Jpeg_write: (%p) Bytes in buff: %ld Ofs: %lu\n", jpeg, (long)BufSize,
+       (ulong_t)jpeg->Start_Ofs);
 
-   /* See if we are supposed to skip ahead. */
-   if (BufSize <= jpeg->Start_Ofs)
-      return;
+  /* See if we are supposed to skip ahead. */
+  if (BufSize <= jpeg->Start_Ofs)
+    return;
 
-   /* Concatenate with the partial input, if any. */
-   jpeg->cinfo.src->next_input_byte = (uchar_t *)Buf + jpeg->Start_Ofs;
-   jpeg->cinfo.src->bytes_in_buffer = BufSize - jpeg->Start_Ofs;
-   jpeg->NewStart = BufSize;
-   jpeg->Data = Buf;
+  /* Concatenate with the partial input, if any. */
+  jpeg->cinfo.src->next_input_byte = (uchar_t *)Buf + jpeg->Start_Ofs;
+  jpeg->cinfo.src->bytes_in_buffer = BufSize - jpeg->Start_Ofs;
+  jpeg->NewStart = BufSize;
+  jpeg->Data = Buf;
 
-   if (setjmp(jpeg->jerr.setjmp_buffer)) {
-      /* If we get here, the JPEG code has signaled an error. */
-      jpeg->state = DILLO_JPEG_ERROR;
+  if (setjmp(jpeg->jerr.setjmp_buffer)) {
+    /* If we get here, the JPEG code has signaled an error. */
+    jpeg->state = DILLO_JPEG_ERROR;
    }
 
    /* Process the bytes in the input buffer. */
@@ -405,7 +408,13 @@ static void Jpeg_write(DilloJpeg *jpeg, void *Buf, uint_t BufSize)
 
 #else /* ENABLE_JPEG */
 
-void *a_Jpeg_new() { return 0; }
-void a_Jpeg_callback() { return; }
+void *a_Jpeg_new() {
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return 0;
+}
+void a_Jpeg_callback() {
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return;
+}
 
 #endif /* ENABLE_JPEG */

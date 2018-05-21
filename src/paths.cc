@@ -30,16 +30,16 @@ static char* oldWorkingDir = NULL;
  */
 void Paths::init(void)
 {
-   char *path;
-   struct stat st;
-   int rc = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *path;
+  struct stat st;
+  int rc = 0;
 
-   dFree(oldWorkingDir);
-   oldWorkingDir = dGetcwd();
-   rc = chdir("/tmp");
-   if (rc == -1) {
-      MSG("paths: Error changing directory to /tmp: %s\n",
-          dStrerror(errno));
+  dFree(oldWorkingDir);
+  oldWorkingDir = dGetcwd();
+  rc = chdir("/tmp");
+  if (rc == -1) {
+    MSG("paths: Error changing directory to /tmp: %s\n", dStrerror(errno));
    }
 
    path = dStrconcat(dGethomedir(), "/.dillo", NULL);
@@ -63,7 +63,8 @@ void Paths::init(void)
  */
 char *Paths::getOldWorkingDir(void)
 {
-   return oldWorkingDir;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return oldWorkingDir;
 }
 
 /*
@@ -71,7 +72,8 @@ char *Paths::getOldWorkingDir(void)
  */
 void Paths::free(void)
 {
-   dFree(oldWorkingDir);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  dFree(oldWorkingDir);
 }
 
 /*
@@ -79,20 +81,21 @@ void Paths::free(void)
  */
 FILE *Paths::getPrefsFP(const char *rcFile)
 {
-   FILE *fp;
-   char *path = dStrconcat(dGethomedir(), "/.dillo/", rcFile, NULL);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  FILE *fp;
+  char *path = dStrconcat(dGethomedir(), "/.dillo/", rcFile, NULL);
 
-   if (!(fp = fopen(path, "r"))) {
-      MSG("paths: Cannot open file '%s': %s\n", path, dStrerror(errno));
+  if (!(fp = fopen(path, "r"))) {
+    MSG("paths: Cannot open file '%s': %s\n", path, dStrerror(errno));
 
-      char *path2 = dStrconcat(DILLO_SYSCONF, rcFile, NULL);
-      if (!(fp = fopen(path2, "r"))) {
-         MSG("paths: Cannot open file '%s': %s\n", path2, dStrerror(errno));
-         MSG("paths: Using internal defaults...\n");
-      } else {
-         MSG("paths: Using %s\n", path2);
-      }
-      dFree(path2);
+    char *path2 = dStrconcat(DILLO_SYSCONF, rcFile, NULL);
+    if (!(fp = fopen(path2, "r"))) {
+      MSG("paths: Cannot open file '%s': %s\n", path2, dStrerror(errno));
+      MSG("paths: Using internal defaults...\n");
+    } else {
+      MSG("paths: Using %s\n", path2);
+    }
+    dFree(path2);
    }
 
    dFree(path);

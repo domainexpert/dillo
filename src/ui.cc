@@ -91,9 +91,11 @@ static struct iconset *icons = &standard_icons;
  */
 class CustInput : public TipWinInput {
 public:
-   CustInput (int x, int y, int w, int h, const char* l=0) :
-      TipWinInput(x,y,w,h,l) {};
-   virtual int handle(int e);
+  CustInput(int x, int y, int w, int h, const char *l = 0)
+      : TipWinInput(x, y, w, h, l) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  };
+  virtual int handle(int e);
 };
 
 /*
@@ -102,17 +104,19 @@ public:
  */
 int CustInput::handle(int e)
 {
-   int k = Fl::event_key();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
 
-   _MSG("CustInput::handle event=%d\n", e);
+  int k = Fl::event_key();
 
-   // We're only interested in some flags
-   unsigned modifier = Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT);
+  _MSG("CustInput::handle event=%d\n", e);
 
-   // Don't focus with arrow keys
-   if (e == FL_FOCUS &&
-       (k == FL_Up || k == FL_Down || k == FL_Left || k == FL_Right)) {
-      return 0;
+  // We're only interested in some flags
+  unsigned modifier = Fl::event_state() & (FL_SHIFT | FL_CTRL | FL_ALT);
+
+  // Don't focus with arrow keys
+  if (e == FL_FOCUS &&
+      (k == FL_Up || k == FL_Down || k == FL_Left || k == FL_Right)) {
+    return 0;
    } else if (e == FL_KEYBOARD) {
       if (k == FL_Escape && modifier == 0) {
          // Let the parent group handle this Esc key
@@ -166,20 +170,23 @@ int CustInput::handle(int e)
  */
 class CustPasteButton : public CustButton {
 public:
-   CustPasteButton(int x, int y, int w, int h, const char *l=0) :
-      CustButton(x,y,w,h,l) {};
-   int handle(int e);
+  CustPasteButton(int x, int y, int w, int h, const char *l = 0)
+      : CustButton(x, y, w, h, l) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  };
+  int handle(int e);
 };
 
 int CustPasteButton::handle(int e)
 {
-   if (e == FL_PASTE) {
-      const char* t = Fl::event_text();
-      if (t && *t) {
-         a_UIcmd_set_location_text(a_UIcmd_get_bw_by_widget(this), t);
-         a_UIcmd_open_urlstr(a_UIcmd_get_bw_by_widget(this), t);
-         return 1;
-      }
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (e == FL_PASTE) {
+    const char *t = Fl::event_text();
+    if (t && *t) {
+      a_UIcmd_set_location_text(a_UIcmd_get_bw_by_widget(this), t);
+      a_UIcmd_open_urlstr(a_UIcmd_get_bw_by_widget(this), t);
+      return 1;
+    }
    }
    return CustButton::handle(e);
 }
@@ -192,16 +199,20 @@ int CustPasteButton::handle(int e)
 class CustProgressBox : public Fl_Box {
    int padding;
 public:
-   CustProgressBox(int x, int y, int w, int h, const char *l=0) :
-      Fl_Box(x,y,w,h,l) { padding = 0; };
-   void update_label(const char *lbl) {
-      int w = 0, h = 0;
-      if (!padding) {
-         copy_label("W");
-         measure_label(w, h);
-         padding = w > 2 ? w/2 : 1;
-      }
-      copy_label(lbl);
+  CustProgressBox(int x, int y, int w, int h, const char *l = 0)
+      : Fl_Box(x, y, w, h, l) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+    padding = 0;
+  };
+  void update_label(const char *lbl) {
+    printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+    int w = 0, h = 0;
+    if (!padding) {
+      copy_label("W");
+      measure_label(w, h);
+      padding = w > 2 ? w / 2 : 1;
+    }
+    copy_label(lbl);
    }
 };
 
@@ -223,10 +234,11 @@ public:
  */
 static void search_cb(Fl_Widget *wid, void *data)
 {
-   int b = Fl::event_button();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int b = Fl::event_button();
 
-   if (b == FL_LEFT_MOUSE) {
-      a_UIcmd_search_dialog(a_UIcmd_get_bw_by_widget(wid));
+  if (b == FL_LEFT_MOUSE) {
+    a_UIcmd_search_dialog(a_UIcmd_get_bw_by_widget(wid));
    }
 }
 
@@ -235,13 +247,14 @@ static void search_cb(Fl_Widget *wid, void *data)
  */
 static void help_cb(Fl_Widget *w, void *)
 {
-   char *path = dStrconcat(DILLO_DOCDIR, "user_help.html", NULL);
-   BrowserWindow *bw = a_UIcmd_get_bw_by_widget(w);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *path = dStrconcat(DILLO_DOCDIR, "user_help.html", NULL);
+  BrowserWindow *bw = a_UIcmd_get_bw_by_widget(w);
 
-   if (access(path, R_OK) == 0) {
-      char *urlstr = dStrconcat("file:", path, NULL);
-      a_UIcmd_open_urlstr(bw, urlstr);
-      dFree(urlstr);
+  if (access(path, R_OK) == 0) {
+    char *urlstr = dStrconcat("file:", path, NULL);
+    a_UIcmd_open_urlstr(bw, urlstr);
+    dFree(urlstr);
    } else {
       MSG("Can't read local help file at \"%s\"."
           " Getting remote help...\n", path);
@@ -255,9 +268,10 @@ static void help_cb(Fl_Widget *w, void *)
  */
 static void filemenu_cb(Fl_Widget *wid, void *)
 {
-   int b = Fl::event_button();
-   if (b == FL_LEFT_MOUSE || b == FL_RIGHT_MOUSE) {
-      a_UIcmd_file_popup(a_UIcmd_get_bw_by_widget(wid), wid);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int b = Fl::event_button();
+  if (b == FL_LEFT_MOUSE || b == FL_RIGHT_MOUSE) {
+    a_UIcmd_file_popup(a_UIcmd_get_bw_by_widget(wid), wid);
    }
 }
 
@@ -266,12 +280,13 @@ static void filemenu_cb(Fl_Widget *wid, void *)
  */
 static void clear_cb(Fl_Widget *w, void *data)
 {
-   UI *ui = (UI*)data;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  UI *ui = (UI *)data;
 
-   int b = Fl::event_button();
-   if (b == FL_LEFT_MOUSE) {
-      ui->set_location("");
-      ui->focus_location();
+  int b = Fl::event_button();
+  if (b == FL_LEFT_MOUSE) {
+    ui->set_location("");
+    ui->focus_location();
    } if (b == FL_MIDDLE_MOUSE) {
       ui->paste_url();
    }
@@ -282,14 +297,15 @@ static void clear_cb(Fl_Widget *w, void *data)
  */
 static void location_cb(Fl_Widget *wid, void *data)
 {
-   Fl_Input *i = (Fl_Input*)wid;
-   UI *ui = (UI*)data;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Fl_Input *i = (Fl_Input *)wid;
+  UI *ui = (UI *)data;
 
-   _MSG("location_cb()\n");
-   a_UIcmd_open_urlstr(a_UIcmd_get_bw_by_widget(i), i->value());
+  _MSG("location_cb()\n");
+  a_UIcmd_open_urlstr(a_UIcmd_get_bw_by_widget(i), i->value());
 
-   if (ui->temporaryPanels())
-      ui->panels_toggle();
+  if (ui->temporaryPanels())
+    ui->panels_toggle();
 }
 
 
@@ -298,11 +314,12 @@ static void location_cb(Fl_Widget *wid, void *data)
  */
 static void b1_cb(Fl_Widget *wid, void *cb_data)
 {
-   int bn = VOIDP2INT(cb_data);
-   int b = Fl::event_button();
-   if (b >= FL_LEFT_MOUSE && b <= FL_RIGHT_MOUSE) {
-      _MSG("[%s], mouse button %d was pressed\n", button_names[bn], b);
-      _MSG("mouse button %d was pressed\n", b);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int bn = VOIDP2INT(cb_data);
+  int b = Fl::event_button();
+  if (b >= FL_LEFT_MOUSE && b <= FL_RIGHT_MOUSE) {
+    _MSG("[%s], mouse button %d was pressed\n", button_names[bn], b);
+    _MSG("mouse button %d was pressed\n", b);
    }
    switch (bn) {
    case UI_BACK:
@@ -362,9 +379,10 @@ static void b1_cb(Fl_Widget *wid, void *cb_data)
  */
 static void bugmeter_cb(Fl_Widget *wid, void *data)
 {
-   int b = Fl::event_button();
-   if (b == FL_LEFT_MOUSE) {
-      a_UIcmd_view_page_bugs(a_UIcmd_get_bw_by_widget(wid));
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int b = Fl::event_button();
+  if (b == FL_LEFT_MOUSE) {
+    a_UIcmd_view_page_bugs(a_UIcmd_get_bw_by_widget(wid));
    } else if (b == FL_RIGHT_MOUSE) {
       a_UIcmd_bugmeter_popup(a_UIcmd_get_bw_by_widget(wid));
    }
@@ -384,21 +402,22 @@ static void bugmeter_cb(Fl_Widget *wid, void *data)
 CustButton *UI::make_button(const char *label, Fl_Image *img, Fl_Image *deimg,
                             int b_n, int start)
 {
-   if (start)
-      p_xpos = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (start)
+    p_xpos = 0;
 
-   CustButton *b = new CustButton(p_xpos, 0, bw, bh, (lbl) ? label : NULL);
-   if (img)
-      b->image(img);
-   if (deimg)
-      b->deimage(deimg);
-   b->callback(b1_cb, INT2VOIDP(b_n));
-   b->clear_visible_focus();
-   b->labelsize(12);
-   b->box(FL_FLAT_BOX);
-   b->down_box(FL_THIN_DOWN_FRAME);
-   p_xpos += bw;
-   return b;
+  CustButton *b = new CustButton(p_xpos, 0, bw, bh, (lbl) ? label : NULL);
+  if (img)
+    b->image(img);
+  if (deimg)
+    b->deimage(deimg);
+  b->callback(b1_cb, INT2VOIDP(b_n));
+  b->clear_visible_focus();
+  b->labelsize(12);
+  b->box(FL_FLAT_BOX);
+  b->down_box(FL_THIN_DOWN_FRAME);
+  p_xpos += bw;
+  return b;
 }
 
 /*
@@ -406,10 +425,11 @@ CustButton *UI::make_button(const char *label, Fl_Image *img, Fl_Image *deimg,
  */
 void UI::make_toolbar(int tw, int th)
 {
-   if (!icons->ImgLeftIn) {
-      icons->ImgLeftIn = icons->ImgLeft->copy();
-      icons->ImgLeftIn->desaturate();
-      icons->ImgLeftIn->color_average(FL_BACKGROUND_COLOR, .14f);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (!icons->ImgLeftIn) {
+    icons->ImgLeftIn = icons->ImgLeft->copy();
+    icons->ImgLeftIn->desaturate();
+    icons->ImgLeftIn->color_average(FL_BACKGROUND_COLOR, .14f);
    }
    if (!icons->ImgRightIn) {
       icons->ImgRightIn = icons->ImgRight->copy();
@@ -445,43 +465,43 @@ void UI::make_toolbar(int tw, int th)
  */
 void UI::make_location(int ww)
 {
-   CustButton *b;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CustButton *b;
 
-    b = Clear = (CustButton*) new CustPasteButton(p_xpos,0,16,lh,0);
-    b->image(icons->ImgClear);
-    b->callback(clear_cb, this);
-    b->clear_visible_focus();
-    b->box(FL_THIN_UP_BOX);
-    b->set_tooltip("Clear the URL box.\nMiddle-click to paste a URL.");
-    p_xpos += b->w();
+  b = Clear = (CustButton *)new CustPasteButton(p_xpos, 0, 16, lh, 0);
+  b->image(icons->ImgClear);
+  b->callback(clear_cb, this);
+  b->clear_visible_focus();
+  b->box(FL_THIN_UP_BOX);
+  b->set_tooltip("Clear the URL box.\nMiddle-click to paste a URL.");
+  p_xpos += b->w();
 
-    LocationGroup = new Fl_Group(p_xpos,0,ww-p_xpos-32,lh,0);
-    LocationGroup->begin();
-     CustInput *i = new CustInput(p_xpos,0,ww-p_xpos-32,lh,0);
-     Location = i;
-     i->when(FL_WHEN_ENTER_KEY);
-     i->callback(location_cb, this);
-     i->set_tooltip("Location");
-     p_xpos += i->w();
-    LocationGroup->box(FL_THIN_UP_BOX);   // or FL_FLAT_BOX
-    LocationGroup->end();
+  LocationGroup = new Fl_Group(p_xpos, 0, ww - p_xpos - 32, lh, 0);
+  LocationGroup->begin();
+  CustInput *i = new CustInput(p_xpos, 0, ww - p_xpos - 32, lh, 0);
+  Location = i;
+  i->when(FL_WHEN_ENTER_KEY);
+  i->callback(location_cb, this);
+  i->set_tooltip("Location");
+  p_xpos += i->w();
+  LocationGroup->box(FL_THIN_UP_BOX); // or FL_FLAT_BOX
+  LocationGroup->end();
 
-    Search = b = new CustButton(p_xpos,0,16,lh,0);
-    b->image(icons->ImgSearch);
-    b->callback(search_cb, this);
-    b->clear_visible_focus();
-    b->box(FL_THIN_UP_BOX);
-    b->set_tooltip("Search the Web");
-    p_xpos += b->w();
+  Search = b = new CustButton(p_xpos, 0, 16, lh, 0);
+  b->image(icons->ImgSearch);
+  b->callback(search_cb, this);
+  b->clear_visible_focus();
+  b->box(FL_THIN_UP_BOX);
+  b->set_tooltip("Search the Web");
+  p_xpos += b->w();
 
-    Help = b = new CustButton(p_xpos,0,16,lh,0);
-    b->image(icons->ImgHelp);
-    b->callback(help_cb, this);
-    b->clear_visible_focus();
-    b->box(FL_THIN_UP_BOX);
-    b->set_tooltip("Help");
-    p_xpos += b->w();
-
+  Help = b = new CustButton(p_xpos, 0, 16, lh, 0);
+  b->image(icons->ImgHelp);
+  b->callback(help_cb, this);
+  b->clear_visible_focus();
+  b->box(FL_THIN_UP_BOX);
+  b->set_tooltip("Help");
+  p_xpos += b->w();
 }
 
 /*
@@ -489,17 +509,18 @@ void UI::make_location(int ww)
  */
 void UI::make_progress_bars(int wide, int thin_up)
 {
-    // Images
-    IProg = new CustProgressBox(p_xpos,p_ypos,pw,bh);
-    IProg->labelsize(12);
-    IProg->box(thin_up ? FL_THIN_UP_BOX : FL_EMBOSSED_BOX);
-    IProg->update_label(wide ? "Images\n0 of 0" : "0 of 0");
-    p_xpos += pw;
-    // Page
-    PProg = new CustProgressBox(p_xpos,p_ypos,pw,bh);
-    PProg->labelsize(12);
-    PProg->box(thin_up ? FL_THIN_UP_BOX : FL_EMBOSSED_BOX);
-    PProg->update_label(wide ? "Page\n0.0 KB" : "0.0 KB");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  // Images
+  IProg = new CustProgressBox(p_xpos, p_ypos, pw, bh);
+  IProg->labelsize(12);
+  IProg->box(thin_up ? FL_THIN_UP_BOX : FL_EMBOSSED_BOX);
+  IProg->update_label(wide ? "Images\n0 of 0" : "0 of 0");
+  p_xpos += pw;
+  // Page
+  PProg = new CustProgressBox(p_xpos, p_ypos, pw, bh);
+  PProg->labelsize(12);
+  PProg->box(thin_up ? FL_THIN_UP_BOX : FL_EMBOSSED_BOX);
+  PProg->update_label(wide ? "Page\n0.0 KB" : "0.0 KB");
 }
 
 /*
@@ -508,26 +529,27 @@ void UI::make_progress_bars(int wide, int thin_up)
  */
 Fl_Widget *UI::make_filemenu_button()
 {
-   CustButton *btn;
-   int w = 0, h = 0, padding;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CustButton *btn;
+  int w = 0, h = 0, padding;
 
-   FileButton = btn = new CustButton(p_xpos,0,bw,bh,"W");
-   btn->labeltype(FL_FREE_LABELTYPE);
-   btn->measure_label(w, h);
-   padding = w;
-   btn->copy_label(PanelSize == P_tiny ? "&F" : "&File");
-   btn->measure_label(w,h);
-   h = (PanelSize == P_tiny) ? bh : lh;
-   btn->size(w+padding, h);
-   p_xpos += btn->w();
-   _MSG("UI::make_filemenu_button w=%d h=%d padding=%d\n", w, h, padding);
-   btn->box(FL_THIN_UP_BOX);
-   btn->callback(filemenu_cb, this);
-   btn->set_tooltip("File menu");
-   btn->clear_visible_focus();
-   if (!prefs.show_filemenu)
-      btn->hide();
-   return btn;
+  FileButton = btn = new CustButton(p_xpos, 0, bw, bh, "W");
+  btn->labeltype(FL_FREE_LABELTYPE);
+  btn->measure_label(w, h);
+  padding = w;
+  btn->copy_label(PanelSize == P_tiny ? "&F" : "&File");
+  btn->measure_label(w, h);
+  h = (PanelSize == P_tiny) ? bh : lh;
+  btn->size(w + padding, h);
+  p_xpos += btn->w();
+  _MSG("UI::make_filemenu_button w=%d h=%d padding=%d\n", w, h, padding);
+  btn->box(FL_THIN_UP_BOX);
+  btn->callback(filemenu_cb, this);
+  btn->set_tooltip("File menu");
+  btn->clear_visible_focus();
+  if (!prefs.show_filemenu)
+    btn->hide();
+  return btn;
 }
 
 
@@ -536,20 +558,21 @@ Fl_Widget *UI::make_filemenu_button()
  */
 void UI::make_panel(int ww)
 {
-   Fl_Widget *w;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Fl_Widget *w;
 
-   if (Small_Icons)
-      icons = &small_icons;
-   else
-      icons = &standard_icons;
+  if (Small_Icons)
+    icons = &small_icons;
+  else
+    icons = &standard_icons;
 
-   pw = 70;
-   p_xpos = p_ypos = 0;
-   if (PanelSize == P_tiny) {
-      if (Small_Icons)
-         bw = 22, bh = 22, mh = 0, lh = 22, lbl = 0;
-      else
-         bw = 28, bh = 28, mh = 0, lh = 28, lbl = 0;
+  pw = 70;
+  p_xpos = p_ypos = 0;
+  if (PanelSize == P_tiny) {
+    if (Small_Icons)
+      bw = 22, bh = 22, mh = 0, lh = 22, lbl = 0;
+    else
+      bw = 28, bh = 28, mh = 0, lh = 28, lbl = 0;
    } else if (PanelSize == P_small) {
       if (Small_Icons)
          bw = 20, bh = 20, mh = 0, lh = 20, lbl = 0;
@@ -616,30 +639,31 @@ void UI::make_panel(int ww)
  */
 void UI::make_status_bar(int ww, int wh)
 {
-   const int bm_w = 20;
-   StatusBar = new CustGroupHorizontal(0, wh-sh, ww, sh);
-   StatusBar->box(FL_NO_BOX);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const int bm_w = 20;
+  StatusBar = new CustGroupHorizontal(0, wh - sh, ww, sh);
+  StatusBar->box(FL_NO_BOX);
 
-    // Status box
-    StatusOutput = new Fl_Output(0, wh-sh, ww-bm_w, sh);
-    StatusOutput->value("http://www.dillo.org");
-    StatusOutput->labelsize(8);
-    StatusOutput->box(FL_THIN_DOWN_BOX);
-    StatusOutput->clear_visible_focus();
-    StatusOutput->color(FL_BACKGROUND_COLOR);
+  // Status box
+  StatusOutput = new Fl_Output(0, wh - sh, ww - bm_w, sh);
+  StatusOutput->value("http://www.dillo.org");
+  StatusOutput->labelsize(8);
+  StatusOutput->box(FL_THIN_DOWN_BOX);
+  StatusOutput->clear_visible_focus();
+  StatusOutput->color(FL_BACKGROUND_COLOR);
 
-    // Bug Meter
-    BugMeter = new CustButton(ww-bm_w,wh-sh,bm_w,sh);
-    BugMeter->image(icons->ImgMeterOK);
-    BugMeter->box(FL_THIN_DOWN_BOX);
-    BugMeter->align(FL_ALIGN_INSIDE | FL_ALIGN_TEXT_NEXT_TO_IMAGE);
-    BugMeter->set_tooltip("Show HTML bugs\n(right-click for menu)");
-    BugMeter->callback(bugmeter_cb, this);
-    BugMeter->clear_visible_focus();
+  // Bug Meter
+  BugMeter = new CustButton(ww - bm_w, wh - sh, bm_w, sh);
+  BugMeter->image(icons->ImgMeterOK);
+  BugMeter->box(FL_THIN_DOWN_BOX);
+  BugMeter->align(FL_ALIGN_INSIDE | FL_ALIGN_TEXT_NEXT_TO_IMAGE);
+  BugMeter->set_tooltip("Show HTML bugs\n(right-click for menu)");
+  BugMeter->callback(bugmeter_cb, this);
+  BugMeter->clear_visible_focus();
 
-   StatusBar->end();
-   StatusBar->resizable(StatusOutput);
-   StatusBar->rearrange();
+  StatusBar->end();
+  StatusBar->resizable(StatusOutput);
+  StatusBar->rearrange();
 }
 
 /*
@@ -648,18 +672,19 @@ void UI::make_status_bar(int ww, int wh)
 UI::UI(int x, int y, int ui_w, int ui_h, const char* label, const UI *cur_ui) :
   CustGroupVertical(x, y, ui_w, ui_h, label)
 {
-   LocBar = NavBar = StatusBar = NULL;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  LocBar = NavBar = StatusBar = NULL;
 
-   Tabs = NULL;
-   TopGroup = this;
-   TopGroup->box(FL_NO_BOX);
-   clear_flag(SHORTCUT_LABEL);
+  Tabs = NULL;
+  TopGroup = this;
+  TopGroup->box(FL_NO_BOX);
+  clear_flag(SHORTCUT_LABEL);
 
-   PanelTemporary = false;
-   if (cur_ui) {
-      PanelSize = cur_ui->PanelSize;
-      Small_Icons = cur_ui->Small_Icons;
-      Panelmode = cur_ui->Panelmode;
+  PanelTemporary = false;
+  if (cur_ui) {
+    PanelSize = cur_ui->PanelSize;
+    Small_Icons = cur_ui->Small_Icons;
+    Panelmode = cur_ui->Panelmode;
    } else {
      // Set some default values
      PanelSize = prefs.panel_size;
@@ -704,7 +729,8 @@ UI::UI(int x, int y, int ui_w, int ui_h, const char* label, const UI *cur_ui) :
  */
 UI::~UI()
 {
-   _MSG("UI::~UI()\n");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("UI::~UI()\n");
 }
 
 /*
@@ -712,11 +738,12 @@ UI::~UI()
  */
 int UI::handle(int event)
 {
-   _MSG("UI::handle event=%s\n", fl_eventnames[event]);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("UI::handle event=%s\n", fl_eventnames[event]);
 
-   int ret = 0;
-   if (event == FL_KEYBOARD) {
-      return 0; // Receive as shortcut
+  int ret = 0;
+  if (event == FL_KEYBOARD) {
+    return 0; // Receive as shortcut
    } else if (event == FL_SHORTCUT) {
       KeysCommand_t cmd = Keys::getKeyCmd();
       if (cmd == KEYS_NOP) {
@@ -806,7 +833,8 @@ int UI::handle(int event)
  */
 const char *UI::get_location()
 {
-   return Location->value();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return Location->value();
 }
 
 /*
@@ -814,9 +842,11 @@ const char *UI::get_location()
  */
 void UI::set_location(const char *str)
 {
-   if (!str) str = "";
-   Location->value(str);
-   Location->position((Fl::focus() == Location) ? strlen(str) : 0);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (!str)
+    str = "";
+  Location->value(str);
+  Location->position((Fl::focus() == Location) ? strlen(str) : 0);
 }
 
 /*
@@ -825,9 +855,10 @@ void UI::set_location(const char *str)
  */
 void UI::focus_location()
 {
-   if (Panelmode == UI_HIDDEN) {
-      panels_toggle();
-      temporaryPanels(true);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (Panelmode == UI_HIDDEN) {
+    panels_toggle();
+    temporaryPanels(true);
    }
    Location->take_focus();
    // Make text selected when already focused.
@@ -839,7 +870,8 @@ void UI::focus_location()
  */
 void UI::focus_main()
 {
-   Main->take_focus();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Main->take_focus();
 }
 
 /*
@@ -847,7 +879,8 @@ void UI::focus_main()
  */
 void UI::set_status(const char *str)
 {
-   StatusOutput->value(str);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  StatusOutput->value(str);
 }
 
 /*
@@ -856,10 +889,11 @@ void UI::set_status(const char *str)
  */
 void UI::set_page_prog(size_t nbytes, int cmd)
 {
-   char str[32];
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char str[32];
 
-   if (cmd == 0) {
-      PProg->deactivate();
+  if (cmd == 0) {
+    PProg->deactivate();
    } else {
       PProg->activate();
       if (cmd == 1) {
@@ -888,10 +922,11 @@ void UI::set_page_prog(size_t nbytes, int cmd)
  */
 void UI::set_img_prog(int n_img, int t_img, int cmd)
 {
-   char str[32];
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char str[32];
 
-   if (cmd == 0) {
-      IProg->deactivate();
+  if (cmd == 0) {
+    IProg->deactivate();
    } else {
       IProg->activate();
       if (cmd == 1) {
@@ -909,12 +944,13 @@ void UI::set_img_prog(int n_img, int t_img, int cmd)
  */
 void UI::set_bug_prog(int n_bug)
 {
-   char str[32];
-   int new_w = 20;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char str[32];
+  int new_w = 20;
 
-   if (n_bug == 0) {
-      BugMeter->image(icons->ImgMeterOK);
-      BugMeter->label("");
+  if (n_bug == 0) {
+    BugMeter->image(icons->ImgMeterOK);
+    BugMeter->label("");
    } else if (n_bug >= 1) {
       if (n_bug == 1)
          BugMeter->image(icons->ImgMeterBug);
@@ -931,33 +967,34 @@ void UI::set_bug_prog(int n_bug)
  */
 void UI::customize()
 {
-   if ( !prefs.show_back )
-      Back->hide();
-   if ( !prefs.show_forw )
-      Forw->hide();
-   if ( !prefs.show_home )
-      Home->hide();
-   if ( !prefs.show_reload )
-      Reload->hide();
-   if ( !prefs.show_save )
-      Save->hide();
-   if ( !prefs.show_stop )
-      Stop->hide();
-   if ( !prefs.show_bookmarks )
-      Bookmarks->hide();
-   if ( !prefs.show_tools )
-      Tools->hide();
-   if ( !prefs.show_clear_url )
-      Clear->hide();
-   if ( !prefs.show_url )
-      Location->hide();
-   if ( !prefs.show_search )
-      Search->hide();
-   if ( !prefs.show_help )
-      Help->hide();
-   if ( !prefs.show_progress_box ) {
-      IProg->hide();
-      PProg->hide();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (!prefs.show_back)
+    Back->hide();
+  if (!prefs.show_forw)
+    Forw->hide();
+  if (!prefs.show_home)
+    Home->hide();
+  if (!prefs.show_reload)
+    Reload->hide();
+  if (!prefs.show_save)
+    Save->hide();
+  if (!prefs.show_stop)
+    Stop->hide();
+  if (!prefs.show_bookmarks)
+    Bookmarks->hide();
+  if (!prefs.show_tools)
+    Tools->hide();
+  if (!prefs.show_clear_url)
+    Clear->hide();
+  if (!prefs.show_url)
+    Location->hide();
+  if (!prefs.show_search)
+    Search->hide();
+  if (!prefs.show_help)
+    Help->hide();
+  if (!prefs.show_progress_box) {
+    IProg->hide();
+    PProg->hide();
    }
 
    if (NavBar)
@@ -971,30 +1008,31 @@ void UI::customize()
  */
 void UI::change_panel(int new_size, int small_icons)
 {
-   char *loc_text = dStrdup(Location->value());
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *loc_text = dStrdup(Location->value());
 
-   // Remove current panel's bars
-   init_sizes();
-   TopGroup->remove(LocBar);
-   Fl::delete_widget(LocBar);
-   TopGroup->remove(NavBar);
-   Fl::delete_widget(NavBar);
-   LocBar = NavBar = NULL;
+  // Remove current panel's bars
+  init_sizes();
+  TopGroup->remove(LocBar);
+  Fl::delete_widget(LocBar);
+  TopGroup->remove(NavBar);
+  Fl::delete_widget(NavBar);
+  LocBar = NavBar = NULL;
 
-   // Set internal vars for panel size
-   PanelSize = new_size;
-   Small_Icons = small_icons;
+  // Set internal vars for panel size
+  PanelSize = new_size;
+  Small_Icons = small_icons;
 
-   // make a new panel
-   make_panel(TopGroup->w());
-   customize();
-   a_UIcmd_set_buttons_sens(a_UIcmd_get_bw_by_widget(this));
+  // make a new panel
+  make_panel(TopGroup->w());
+  customize();
+  a_UIcmd_set_buttons_sens(a_UIcmd_get_bw_by_widget(this));
 
-   TopGroup->rearrange();
-   Location->value(loc_text);
-   Location->take_focus();
+  TopGroup->rearrange();
+  Location->value(loc_text);
+  Location->take_focus();
 
-   dFree(loc_text);
+  dFree(loc_text);
 }
 
 /*
@@ -1002,14 +1040,15 @@ void UI::change_panel(int new_size, int small_icons)
  */
 void UI::set_render_layout(Fl_Group *nw)
 {
-   // Resize layout widget to current height
-   nw->resize(0,Main->y(),Main->w(),Main->h());
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  // Resize layout widget to current height
+  nw->resize(0, Main->y(), Main->w(), Main->h());
 
-   TopGroup->insert(*nw, Main);
-   remove(Main);
-   delete(Main);
-   Main = nw;
-   TopGroup->resizable(Main);
+  TopGroup->insert(*nw, Main);
+  remove(Main);
+  delete (Main);
+  Main = nw;
+  TopGroup->resizable(Main);
 }
 
 /*
@@ -1017,18 +1056,19 @@ void UI::set_render_layout(Fl_Group *nw)
  */
 void UI::button_set_sens(UIButton btn, int sens)
 {
-   switch (btn) {
-   case UI_BACK:
-      (sens) ? Back->activate() : Back->deactivate();
-      break;
-   case UI_FORW:
-      (sens) ? Forw->activate() : Forw->deactivate();
-      break;
-   case UI_STOP:
-      (sens) ? Stop->activate() : Stop->deactivate();
-      break;
-   default:
-      break;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  switch (btn) {
+  case UI_BACK:
+    (sens) ? Back->activate() : Back->deactivate();
+    break;
+  case UI_FORW:
+    (sens) ? Forw->activate() : Forw->deactivate();
+    break;
+  case UI_STOP:
+    (sens) ? Stop->activate() : Stop->deactivate();
+    break;
+  default:
+    break;
    }
 }
 
@@ -1037,7 +1077,8 @@ void UI::button_set_sens(UIButton btn, int sens)
  */
 void UI::paste_url()
 {
-   Fl::paste(*Clear, false);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Fl::paste(*Clear, false);
 }
 
 /*
@@ -1045,17 +1086,18 @@ void UI::paste_url()
  */
 void UI::findbar_toggle(bool add)
 {
-   /* WORKAROUND:
-    * This is tricky: As fltk-1.3 resizes hidden widgets (which it
-    * doesn't resize when visible!). We need to set the size to (0,0) to
-    * get the desired behaviour.
-    * (STR#2639 in FLTK bug tracker).
-    */
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  /* WORKAROUND:
+   * This is tricky: As fltk-1.3 resizes hidden widgets (which it
+   * doesn't resize when visible!). We need to set the size to (0,0) to
+   * get the desired behaviour.
+   * (STR#2639 in FLTK bug tracker).
+   */
 
-   if (add) {
-      if (!FindBar->visible())
-         FindBar->size(w(), fh);
-      FindBar->show();
+  if (add) {
+    if (!FindBar->visible())
+      FindBar->size(w(), fh);
+    FindBar->show();
    } else {
       // hide
       FindBar->size(0,0);
@@ -1076,13 +1118,14 @@ void UI::findbar_toggle(bool add)
  */
 void UI::panels_toggle()
 {
-   int hide = StatusBar->visible();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int hide = StatusBar->visible();
 
-   // hide/show panels
-   init_sizes();
-   if (LocBar) {
-      hide ? LocBar->size(0,0) : LocBar->size(w(),lh);
-      hide ? LocBar->hide() : LocBar->show();
+  // hide/show panels
+  init_sizes();
+  if (LocBar) {
+    hide ? LocBar->size(0, 0) : LocBar->size(w(), lh);
+    hide ? LocBar->hide() : LocBar->show();
    }
    if (NavBar) {
       hide ? NavBar->size(0,0) : NavBar->size(w(),nh);

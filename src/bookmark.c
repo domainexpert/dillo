@@ -26,14 +26,15 @@
  */
 void a_Bookmarks_chat_add(BrowserWindow *Bw, char *Cmd, char *answer)
 {
-   static char *cmd1 = NULL, *cmd2 = NULL, *cmd3 = NULL, *cmd4 = NULL;
-   static BrowserWindow *bw = NULL;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  static char *cmd1 = NULL, *cmd2 = NULL, *cmd3 = NULL, *cmd4 = NULL;
+  static BrowserWindow *bw = NULL;
 
-   if (!cmd1) {
-      cmd1 = a_Dpip_build_cmd("cmd=%s msg=%s", "chat", "Hi server");
-      cmd2 = a_Dpip_build_cmd("cmd=%s msg=%s", "chat",
-                              "I want to set a bookmark");
-      cmd3 = a_Dpip_build_cmd("cmd=%s msg=%s", "chat", "Sure it is!");
+  if (!cmd1) {
+    cmd1 = a_Dpip_build_cmd("cmd=%s msg=%s", "chat", "Hi server");
+    cmd2 =
+        a_Dpip_build_cmd("cmd=%s msg=%s", "chat", "I want to set a bookmark");
+    cmd3 = a_Dpip_build_cmd("cmd=%s msg=%s", "chat", "Sure it is!");
    }
 
    _MSG("a_Bookmarks_chat_add\n answer=%s\n", answer ? answer : "(null)");
@@ -70,17 +71,18 @@ void a_Bookmarks_chat_add(BrowserWindow *Bw, char *Cmd, char *answer)
  */
 void a_Bookmarks_add(BrowserWindow *bw, const DilloUrl *url)
 {
-   const char *title;
-   char *cmd;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const char *title;
+  char *cmd;
 
-   dReturn_if_fail(url != NULL);
+  dReturn_if_fail(url != NULL);
 
-   /* if the page has no title, we'll use the url string */
-   title = a_History_get_title_by_url(url, 1);
+  /* if the page has no title, we'll use the url string */
+  title = a_History_get_title_by_url(url, 1);
 
-   cmd = a_Dpip_build_cmd("cmd=%s url=%s title=%s",
-                          "add_bookmark", URL_STR(url), title);
-   a_Bookmarks_chat_add(bw, cmd, NULL);
-   dFree(cmd);
+  cmd = a_Dpip_build_cmd("cmd=%s url=%s title=%s", "add_bookmark", URL_STR(url),
+                         title);
+  a_Bookmarks_chat_add(bw, cmd, NULL);
+  dFree(cmd);
 }
 

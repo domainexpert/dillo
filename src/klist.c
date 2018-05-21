@@ -26,7 +26,8 @@
  */
 static int Klist_node_by_key_cmp(const void *Node, const void *key)
 {
-   return ((KlistNode_t *)Node)->Key - VOIDP2INT(key);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return ((KlistNode_t *)Node)->Key - VOIDP2INT(key);
 }
 
 /*
@@ -34,7 +35,8 @@ static int Klist_node_by_key_cmp(const void *Node, const void *key)
  */
 static int Klist_node_by_node_cmp(const void *Node1, const void *Node2)
 {
-   return ((KlistNode_t *)Node1)->Key - ((KlistNode_t *)Node2)->Key;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return ((KlistNode_t *)Node1)->Key - ((KlistNode_t *)Node2)->Key;
 }
 
 /*
@@ -42,12 +44,13 @@ static int Klist_node_by_node_cmp(const void *Node1, const void *Node2)
  */
 void *a_Klist_get_data(Klist_t *Klist, int Key)
 {
-   void *aux;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  void *aux;
 
-   if (!Klist)
-      return NULL;
-   aux = dList_find_sorted(Klist->List, INT2VOIDP(Key), Klist_node_by_key_cmp);
-   return (aux) ? ((KlistNode_t*)aux)->Data : NULL;
+  if (!Klist)
+    return NULL;
+  aux = dList_find_sorted(Klist->List, INT2VOIDP(Key), Klist_node_by_key_cmp);
+  return (aux) ? ((KlistNode_t *)aux)->Data : NULL;
 }
 
 /*
@@ -55,13 +58,14 @@ void *a_Klist_get_data(Klist_t *Klist, int Key)
  */
 int a_Klist_insert(Klist_t **Klist, void *Data)
 {
-   KlistNode_t *Node;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  KlistNode_t *Node;
 
-   if (!*Klist) {
-      (*Klist) = dNew(Klist_t, 1);
-      (*Klist)->List = dList_new(32);
-      (*Klist)->Clean = 1;
-      (*Klist)->Counter = 0;
+  if (!*Klist) {
+    (*Klist) = dNew(Klist_t, 1);
+    (*Klist)->List = dList_new(32);
+    (*Klist)->Clean = 1;
+    (*Klist)->Counter = 0;
    }
 
    /* This avoids repeated keys at the same time */
@@ -85,12 +89,13 @@ int a_Klist_insert(Klist_t **Klist, void *Data)
  */
 void a_Klist_remove(Klist_t *Klist, int Key)
 {
-   void *data;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  void *data;
 
-   data = dList_find_sorted(Klist->List, INT2VOIDP(Key),Klist_node_by_key_cmp);
-   if (data) {
-      dList_remove(Klist->List, data);
-      dFree(data);
+  data = dList_find_sorted(Klist->List, INT2VOIDP(Key), Klist_node_by_key_cmp);
+  if (data) {
+    dList_remove(Klist->List, data);
+    dFree(data);
    }
    if (dList_length(Klist->List) == 0)
       Klist->Clean = 1;
@@ -101,7 +106,8 @@ void a_Klist_remove(Klist_t *Klist, int Key)
  */
 int a_Klist_length(Klist_t *Klist)
 {
-   return dList_length(Klist->List);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return dList_length(Klist->List);
 }
 
 /*
@@ -109,16 +115,17 @@ int a_Klist_length(Klist_t *Klist)
  */
 void a_Klist_free(Klist_t **KlistPtr)
 {
-   void *node;
-   Klist_t *Klist = *KlistPtr;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  void *node;
+  Klist_t *Klist = *KlistPtr;
 
-   if (!Klist)
-      return;
+  if (!Klist)
+    return;
 
-   while (dList_length(Klist->List) > 0) {
-      node = dList_nth_data(Klist->List, 0);
-      dList_remove_fast(Klist->List, node);
-      dFree(node);
+  while (dList_length(Klist->List) > 0) {
+    node = dList_nth_data(Klist->List, 0);
+    dList_remove_fast(Klist->List, node);
+    dFree(node);
    }
    dList_free(Klist->List);
    dFree(Klist);

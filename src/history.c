@@ -35,12 +35,13 @@ static int history_size_max = 16;
  */
 void History_show()
 {
-   int i;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
 
-   MSG("  {");
-   for (i = 0; i < history_size; ++i)
-      MSG(" %s", URL_STR(history[i].url));
-   MSG(" }\n");
+  MSG("  {");
+  for (i = 0; i < history_size; ++i)
+    MSG(" %s", URL_STR(history[i].url));
+  MSG(" }\n");
 }
 
 /*
@@ -49,17 +50,18 @@ void History_show()
  */
 int a_History_add_url(DilloUrl *url)
 {
-   int i, idx;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i, idx;
 
-   _MSG("a_History_add_url: '%s' ", URL_STR(url));
-   for (i = 0; i < history_size; ++i)
-      if (!a_Url_cmp(history[i].url, url) &&
-          !strcmp(URL_FRAGMENT(history[i].url), URL_FRAGMENT(url)))
-         break;
+  _MSG("a_History_add_url: '%s' ", URL_STR(url));
+  for (i = 0; i < history_size; ++i)
+    if (!a_Url_cmp(history[i].url, url) &&
+        !strcmp(URL_FRAGMENT(history[i].url), URL_FRAGMENT(url)))
+      break;
 
-   if (i < history_size) {
-      idx = i;
-      _MSG("FOUND at idx=%d\n", idx);
+  if (i < history_size) {
+    idx = i;
+    _MSG("FOUND at idx=%d\n", idx);
    } else {
       idx = history_size;
       a_List_add(history, history_size, history_size_max);
@@ -79,12 +81,13 @@ int a_History_add_url(DilloUrl *url)
  */
 const DilloUrl *a_History_get_url(int idx)
 {
-   _MSG("a_History_get_url: ");
-   /* History_show(); */
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("a_History_get_url: ");
+  /* History_show(); */
 
-   dReturn_val_if_fail(idx >= 0 && idx < history_size, NULL);
+  dReturn_val_if_fail(idx >= 0 && idx < history_size, NULL);
 
-   return history[idx].url;
+  return history[idx].url;
 }
 
 /*
@@ -93,14 +96,15 @@ const DilloUrl *a_History_get_url(int idx)
  */
 const char *a_History_get_title(int idx, int force)
 {
-   dReturn_val_if_fail(idx >= 0 && idx < history_size, NULL);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  dReturn_val_if_fail(idx >= 0 && idx < history_size, NULL);
 
-   if (history[idx].title)
-      return history[idx].title;
-   else if (force)
-      return URL_STR(history[idx].url);
-   else
-      return NULL;
+  if (history[idx].title)
+    return history[idx].title;
+  else if (force)
+    return URL_STR(history[idx].url);
+  else
+    return NULL;
 }
 
 /*
@@ -109,19 +113,20 @@ const char *a_History_get_title(int idx, int force)
  */
 const char *a_History_get_title_by_url(const DilloUrl *url, int force)
 {
-   int i;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
 
-   dReturn_val_if_fail(url != NULL, NULL);
+  dReturn_val_if_fail(url != NULL, NULL);
 
-   for (i = 0; i < history_size; ++i)
-      if (a_Url_cmp(url, history[i].url) == 0)
-         break;
+  for (i = 0; i < history_size; ++i)
+    if (a_Url_cmp(url, history[i].url) == 0)
+      break;
 
-   if (i < history_size && history[i].title)
-      return history[i].title;
-   else if (force)
-      return URL_STR_(url);
-   return NULL;
+  if (i < history_size && history[i].title)
+    return history[i].title;
+  else if (force)
+    return URL_STR_(url);
+  return NULL;
 }
 
 /*
@@ -129,17 +134,18 @@ const char *a_History_get_title_by_url(const DilloUrl *url, int force)
  */
 void a_History_set_title_by_url(const DilloUrl *url, const char *title)
 {
-   int i;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
 
-   dReturn_if (url == NULL);
+  dReturn_if(url == NULL);
 
-   for (i = history_size - 1; i >= 0; --i)
-      if (a_Url_cmp(url, history[i].url) == 0)
-         break;
+  for (i = history_size - 1; i >= 0; --i)
+    if (a_Url_cmp(url, history[i].url) == 0)
+      break;
 
-   if (i >= 0) {
-      dFree(history[i].title);
-      history[i].title = dStrdup(title);
+  if (i >= 0) {
+    dFree(history[i].title);
+    history[i].title = dStrdup(title);
    } else {
       MSG_ERR("a_History_set_title_by_url: %s not found\n", URL_STR(url));
    }
@@ -151,11 +157,12 @@ void a_History_set_title_by_url(const DilloUrl *url, const char *title)
  */
 void a_History_freeall()
 {
-   int i;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
 
-   for (i = 0; i < history_size; ++i) {
-      a_Url_free(history[i].url);
-      dFree(history[i].title);
+  for (i = 0; i < history_size; ++i) {
+    a_Url_free(history[i].url);
+    dFree(history[i].title);
    }
    dFree(history);
 }

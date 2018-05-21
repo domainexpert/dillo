@@ -219,6 +219,7 @@ static const struct key {
  */
 static int32_t Color_parse_hex (const char *s, int32_t default_color, int *err)
 {
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
   int32_t ret_color;
   char *tail;
 
@@ -257,16 +258,18 @@ static int32_t Color_parse_hex (const char *s, int32_t default_color, int *err)
  */
 int32_t a_Color_parse (const char *str, int32_t default_color, int *err)
 {
-   const char *cp;
-   int32_t ret_color;
-   int ret, low, mid, high, st = 1;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const char *cp;
+  int32_t ret_color;
+  int ret, low, mid, high, st = 1;
 
-   /* skip leading spaces */
-   for (cp = str; dIsspace(*cp); cp++);
+  /* skip leading spaces */
+  for (cp = str; dIsspace(*cp); cp++)
+    ;
 
-   ret_color = default_color;
-   if (*cp == '#') {
-      ret_color = Color_parse_hex(cp + 1, default_color, &st);
+  ret_color = default_color;
+  if (*cp == '#') {
+    ret_color = Color_parse_hex(cp + 1, default_color, &st);
 
    } else if (*cp == '0' && (cp[1] == 'x' || cp[1] == 'X') ) {
       ret_color = Color_parse_hex(cp + 2, default_color, &st);
@@ -309,7 +312,8 @@ int32_t a_Color_parse (const char *str, int32_t default_color, int *err)
  */
 static int Color_distance(long c1, long c2)
 {
-   return (labs((c1 & 0x0000ff) - (c2 & 0x0000ff)) +
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return (labs((c1 & 0x0000ff) - (c2 & 0x0000ff)) +
            labs(((c1 & 0x00ff00) - (c2 & 0x00ff00)) >> 8)  +
            labs(((c1 & 0xff0000) - (c2 & 0xff0000)) >> 16)) / 75;
 }
@@ -320,9 +324,10 @@ static int Color_distance(long c1, long c2)
  */
 static int Color_distance2(long c1, long c2)
 {
-   return (labs((c1 & 0x0000ff) - (c2 & 0x0000ff)) >= 0x000060) +
-          (labs((c1 & 0x00ff00) - (c2 & 0x00ff00)) >= 0x006000) +
-          (labs((c1 & 0xff0000) - (c2 & 0xff0000)) >= 0x600000);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return (labs((c1 & 0x0000ff) - (c2 & 0x0000ff)) >= 0x000060) +
+         (labs((c1 & 0x00ff00) - (c2 & 0x00ff00)) >= 0x006000) +
+         (labs((c1 & 0xff0000) - (c2 & 0xff0000)) >= 0x600000);
 }
 
 /*
@@ -330,9 +335,10 @@ static int Color_distance2(long c1, long c2)
  */
 static int Color_distance3(long c1, long c2)
 {
-   return (labs((c1 & 0x0000ff) - (c2 & 0x0000ff)) >= 0x000040) +
-          (labs((c1 & 0x00ff00) - (c2 & 0x00ff00)) >= 0x004000) +
-          (labs((c1 & 0xff0000) - (c2 & 0xff0000)) >= 0x400000);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return (labs((c1 & 0x0000ff) - (c2 & 0x0000ff)) >= 0x000040) +
+         (labs((c1 & 0x00ff00) - (c2 & 0x00ff00)) >= 0x004000) +
+         (labs((c1 & 0xff0000) - (c2 & 0xff0000)) >= 0x400000);
 }
 
 /*
@@ -344,7 +350,8 @@ static int Color_distance3(long c1, long c2)
 int32_t a_Color_vc(int32_t candidate,
                    int32_t C_txt, int32_t C_lnk, int32_t C_bg)
 {
-                    /* candidate purple    darkcyan  darkmagenta olive   */
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  /* candidate purple    darkcyan  darkmagenta olive   */
   static int32_t v[] = {0x000000, 0x800080, 0x008b8b, 0x8b008b, 0x808000,
                     /* darkred   coral     black                        */
                        0x8b0000, 0xff7f50, 0x000000};

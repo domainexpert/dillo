@@ -24,22 +24,25 @@
 static void Chain_debug_msg(char *FuncStr, int Op, int Branch, int Dir,
                             ChainLink *Info)
 {
-   const char *StrOps[] = {"", "OpStart", "OpSend",
-                            "OpStop", "OpEnd", "OpAbort"};
-   MSG("%-*s: %-*s [%d%s] Info=%p Flags=%d\n",
-       12, FuncStr, 7, StrOps[Op], Branch, (Dir == 1) ? "F" : "B",
-       Info, Info ? Info->Flags : -1);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const char *StrOps[] = {"",       "OpStart", "OpSend",
+                          "OpStop", "OpEnd",   "OpAbort"};
+  MSG("%-*s: %-*s [%d%s] Info=%p Flags=%d\n", 12, FuncStr, 7, StrOps[Op],
+      Branch, (Dir == 1) ? "F" : "B", Info, Info ? Info->Flags : -1);
 }
 #else
 static void Chain_debug_msg(char *FuncStr, int Op, int Branch, int Dir,
-                            ChainLink *Info) { }
+                            ChainLink *Info) {
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+}
 #endif
 /*
  * Create and initialize a new chain-link
  */
 ChainLink *a_Chain_new(void)
 {
-   return dNew0(ChainLink, 1);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return dNew0(ChainLink, 1);
 }
 
 /*
@@ -54,16 +57,17 @@ ChainLink *a_Chain_link_new(ChainLink *AInfo, ChainFunction_t AFunc,
                             int Direction, ChainFunction_t BFunc,
                             int AtoB_branch, int BtoA_branch)
 {
-   ChainLink *NewLink = a_Chain_new();
-   ChainLink *OldLink = AInfo;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  ChainLink *NewLink = a_Chain_new();
+  ChainLink *OldLink = AInfo;
 
-   if (Direction == BCK) {
-      NewLink->Fcb       = AFunc;
-      NewLink->FcbInfo   = AInfo;
-      NewLink->FcbBranch = BtoA_branch;
-      OldLink->Bcb       = BFunc;
-      OldLink->BcbInfo   = NewLink;
-      OldLink->BcbBranch = AtoB_branch;
+  if (Direction == BCK) {
+    NewLink->Fcb = AFunc;
+    NewLink->FcbInfo = AInfo;
+    NewLink->FcbBranch = BtoA_branch;
+    OldLink->Bcb = BFunc;
+    OldLink->BcbInfo = NewLink;
+    OldLink->BcbBranch = AtoB_branch;
 
    } else { /* FWD */
       NewLink->Bcb       = AFunc;
@@ -83,10 +87,11 @@ ChainLink *a_Chain_link_new(ChainLink *AInfo, ChainFunction_t AFunc,
  */
 void a_Chain_unlink(ChainLink *Info, int Direction)
 {
-   if (Direction == FWD) {
-      Info->Fcb = NULL;
-      Info->FcbInfo = NULL;
-      Info->FcbBranch = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (Direction == FWD) {
+    Info->Fcb = NULL;
+    Info->FcbInfo = NULL;
+    Info->FcbBranch = 0;
    } else {      /* BCK */
       Info->Bcb = NULL;
       Info->BcbInfo = NULL;
@@ -100,10 +105,11 @@ void a_Chain_unlink(ChainLink *Info, int Direction)
  */
 int a_Chain_fcb(int Op, ChainLink *Info, void *Data1, void *Data2)
 {
-   int ret = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int ret = 0;
 
-   if (Info->Flags & (CCC_Ended + CCC_Aborted)) {
-      /* CCC is not operative */
+  if (Info->Flags & (CCC_Ended + CCC_Aborted)) {
+    /* CCC is not operative */
    } else if (Info->Fcb) {
       /* flag the caller */
       if (Op == OpEnd)
@@ -123,10 +129,11 @@ int a_Chain_fcb(int Op, ChainLink *Info, void *Data1, void *Data2)
  */
 int a_Chain_bcb(int Op, ChainLink *Info, void *Data1, void *Data2)
 {
-   int ret = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int ret = 0;
 
-   if (Info->Flags & (CCC_Ended + CCC_Aborted)) {
-      /* CCC is not operative */
+  if (Info->Flags & (CCC_Ended + CCC_Aborted)) {
+    /* CCC is not operative */
    } else if (Info->Bcb) {
       /* flag the caller */
       if (Op == OpEnd)
@@ -147,17 +154,18 @@ int a_Chain_bcb(int Op, ChainLink *Info, void *Data1, void *Data2)
  */
 int a_Chain_bfcb(int Op, ChainLink *Info, void *Data1, void *Data2)
 {
-   int ret;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int ret;
 
-   ret = a_Chain_bcb(Op, Info, Data1, Data2);
-   if (ret == 1) {
-      /* we need to clear the flag to reuse this 'Info' ChainLink */
-      if (Op == OpEnd)
-         Info->Flags &= ~CCC_Ended;
-      else if (Op == OpAbort)
-         Info->Flags &= ~CCC_Aborted;
+  ret = a_Chain_bcb(Op, Info, Data1, Data2);
+  if (ret == 1) {
+    /* we need to clear the flag to reuse this 'Info' ChainLink */
+    if (Op == OpEnd)
+      Info->Flags &= ~CCC_Ended;
+    else if (Op == OpAbort)
+      Info->Flags &= ~CCC_Aborted;
 
-      ret = a_Chain_fcb(Op, Info, Data1, Data2);
+    ret = a_Chain_fcb(Op, Info, Data1, Data2);
    }
    return ret;
 }
@@ -168,11 +176,12 @@ int a_Chain_bfcb(int Op, ChainLink *Info, void *Data1, void *Data2)
  */
 DataBuf *a_Chain_dbuf_new(void *buf, int size, int code)
 {
-   DataBuf *dbuf = dNew(DataBuf, 1);
-   dbuf->Buf = buf;
-   dbuf->Size = size;
-   dbuf->Code = code;
-   return dbuf;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DataBuf *dbuf = dNew(DataBuf, 1);
+  dbuf->Buf = buf;
+  dbuf->Size = size;
+  dbuf->Code = code;
+  return dbuf;
 }
 
 /*
@@ -184,16 +193,17 @@ DataBuf *a_Chain_dbuf_new(void *buf, int size, int code)
 int a_Chain_check(char *FuncStr, int Op, int Branch, int Dir,
                   ChainLink *Info)
 {
-   int ret = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int ret = 0;
 
-   /* Show status information */
-   Chain_debug_msg(FuncStr, Op, Branch, Dir, Info);
+  /* Show status information */
+  Chain_debug_msg(FuncStr, Op, Branch, Dir, Info);
 
-   if (Info->Flags & (CCC_Ended + CCC_Aborted)) {
-      /* CCC is not operative */
-      MSG_WARN("CCC: call on already finished chain. Flags=%s%s\n",
-               Info->Flags & CCC_Ended ? "CCC_Ended " : "",
-               Info->Flags & CCC_Aborted ? "CCC_Aborted" : "");
+  if (Info->Flags & (CCC_Ended + CCC_Aborted)) {
+    /* CCC is not operative */
+    MSG_WARN("CCC: call on already finished chain. Flags=%s%s\n",
+             Info->Flags & CCC_Ended ? "CCC_Ended " : "",
+             Info->Flags & CCC_Aborted ? "CCC_Aborted" : "");
    } else {
       ret = 1;
    }

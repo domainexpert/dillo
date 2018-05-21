@@ -115,24 +115,25 @@ static const CLI_options Options[] = {
  */
 static void raw_sigchld2(int signum)
 {
-   pid_t pid;
-   int status;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  pid_t pid;
+  int status;
 
-   while (1) {
-      pid = waitpid(-1, &status, WNOHANG);
-      if (pid > 0) {
-         if (WIFEXITED(status))        /* normal exit */
-            printf("[dpid]: terminated normally (%d)\n", WEXITSTATUS(status));
-         else if (WIFSIGNALED(status)) /* terminated by signal */
-            printf("[dpid]: terminated by signal %d\n", WTERMSIG(status));
-      } else if (pid == 0 || errno == ECHILD) {
-         break;
-      } else {
-         if (errno == EINTR)
-            continue;
-         perror("waitpid");
-         break;
-      }
+  while (1) {
+    pid = waitpid(-1, &status, WNOHANG);
+    if (pid > 0) {
+      if (WIFEXITED(status)) /* normal exit */
+        printf("[dpid]: terminated normally (%d)\n", WEXITSTATUS(status));
+      else if (WIFSIGNALED(status)) /* terminated by signal */
+        printf("[dpid]: terminated by signal %d\n", WTERMSIG(status));
+    } else if (pid == 0 || errno == ECHILD) {
+      break;
+    } else {
+      if (errno == EINTR)
+        continue;
+      perror("waitpid");
+      break;
+    }
    }
    ++signum; /* compiler happiness */
 }
@@ -142,16 +143,17 @@ static void raw_sigchld2(int signum)
  */
 static void est_sigchld(void)
 {
-   struct sigaction sigact;
-   sigset_t set;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  struct sigaction sigact;
+  sigset_t set;
 
-   (void) sigemptyset(&set);
-   sigact.sa_handler = raw_sigchld2; /* our custom handler */
-   sigact.sa_mask = set;             /* no aditional signal blocks */
-   sigact.sa_flags = SA_NOCLDSTOP;   /* ignore stop/resume states */
-   if (sigaction(SIGCHLD, &sigact, NULL) == -1) {
-      perror("sigaction");
-      exit(1);
+  (void)sigemptyset(&set);
+  sigact.sa_handler = raw_sigchld2; /* our custom handler */
+  sigact.sa_mask = set;             /* no aditional signal blocks */
+  sigact.sa_flags = SA_NOCLDSTOP;   /* ignore stop/resume states */
+  if (sigaction(SIGCHLD, &sigact, NULL) == -1) {
+    perror("sigaction");
+    exit(1);
    }
 }
 
@@ -162,11 +164,13 @@ static void est_sigchld(void)
  */
 static void printHelp(const char *cmdname, const CLI_options *options)
 {
-   printf("Usage: %s [OPTION]... [--] [URL|FILE]...\n"
-          "Options:\n", cmdname);
-   while (options && options->help) {
-      printf("%s\n", options->help);
-      options++;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  printf("Usage: %s [OPTION]... [--] [URL|FILE]...\n"
+         "Options:\n",
+         cmdname);
+  while (options && options->help) {
+    printf("%s\n", options->help);
+    options++;
    }
    printf("  URL                    URL to browse.\n"
           "  FILE                   Local FILE to view.\n"
@@ -178,12 +182,13 @@ static void printHelp(const char *cmdname, const CLI_options *options)
  */
 static int numOptions(const CLI_options *options)
 {
-   int i, max;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i, max;
 
-   for (i = 0, max = 0; options[i].shortopt; i++)
-      if (abs(options[i].opt_argc) > max)
-         max = abs(options[i].opt_argc);
-   return max;
+  for (i = 0, max = 0; options[i].shortopt; i++)
+    if (abs(options[i].opt_argc) > max)
+      max = abs(options[i].opt_argc);
+  return max;
 }
 
 /*
@@ -192,13 +197,14 @@ static int numOptions(const CLI_options *options)
 static OptID getCmdOption(const CLI_options *options, int argc, char **argv,
                            char **opt_argv, int *idx)
 {
-   typedef enum { O_SEARCH, O_FOUND, O_NOTFOUND, O_DONE } State;
-   OptID opt_id = DILLO_CLI_NONE;
-   int i = 0;
-   State state = O_SEARCH;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  typedef enum { O_SEARCH, O_FOUND, O_NOTFOUND, O_DONE } State;
+  OptID opt_id = DILLO_CLI_NONE;
+  int i = 0;
+  State state = O_SEARCH;
 
-   if (*idx >= argc) {
-      state = O_DONE;
+  if (*idx >= argc) {
+    state = O_DONE;
    } else {
       state = O_NOTFOUND;
       for (i = 0; options[i].shortopt; i++) {
@@ -244,41 +250,45 @@ static OptID getCmdOption(const CLI_options *options, int argc, char **argv,
 static void custLabelDraw(const Fl_Label* o, int X, int Y, int W, int H,
                           Fl_Align align)
 {
-   const int interpret_symbols = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const int interpret_symbols = 0;
 
-   fl_draw_shortcut = 0;
-   fl_font(o->font, o->size);
-   fl_color((Fl_Color)o->color);
-   fl_draw(o->value, X, Y, W, H, align, o->image, interpret_symbols);
+  fl_draw_shortcut = 0;
+  fl_font(o->font, o->size);
+  fl_color((Fl_Color)o->color);
+  fl_draw(o->value, X, Y, W, H, align, o->image, interpret_symbols);
 }
 
 static void custLabelMeasure(const Fl_Label* o, int& W, int& H)
 {
-   const int interpret_symbols = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const int interpret_symbols = 0;
 
-   fl_draw_shortcut = 0;
-   fl_font(o->font, o->size);
-   fl_measure(o->value, W, H, interpret_symbols);
+  fl_draw_shortcut = 0;
+  fl_font(o->font, o->size);
+  fl_measure(o->value, W, H, interpret_symbols);
 }
 
 static void custMenuLabelDraw(const Fl_Label* o, int X, int Y, int W, int H,
                               Fl_Align align)
 {
-   const int interpret_symbols = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const int interpret_symbols = 0;
 
-   fl_draw_shortcut = 1;
-   fl_font(o->font, o->size);
-   fl_color((Fl_Color)o->color);
-   fl_draw(o->value, X, Y, W, H, align, o->image, interpret_symbols);
+  fl_draw_shortcut = 1;
+  fl_font(o->font, o->size);
+  fl_color((Fl_Color)o->color);
+  fl_draw(o->value, X, Y, W, H, align, o->image, interpret_symbols);
 }
 
 static void custMenuLabelMeasure(const Fl_Label* o, int& W, int& H)
 {
-   const int interpret_symbols = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const int interpret_symbols = 0;
 
-   fl_draw_shortcut = 1;
-   fl_font(o->font, o->size);
-   fl_measure(o->value, W, H, interpret_symbols);
+  fl_draw_shortcut = 1;
+  fl_font(o->font, o->size);
+  fl_measure(o->value, W, H, interpret_symbols);
 }
 
 /*
@@ -286,17 +296,19 @@ static void custMenuLabelMeasure(const Fl_Label* o, int& W, int& H)
  */
 static void checkFont(const char *name, const char *type)
 {
-   if (! dw::fltk::FltkFont::fontExists(name))
-      MSG_WARN("preferred %s font \"%s\" not found.\n", type, name);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (!dw::fltk::FltkFont::fontExists(name))
+    MSG_WARN("preferred %s font \"%s\" not found.\n", type, name);
 }
 
 static void checkPreferredFonts()
 {
-   checkFont(prefs.font_sans_serif, "sans-serif");
-   checkFont(prefs.font_serif, "serif");
-   checkFont(prefs.font_monospace, "monospace");
-   checkFont(prefs.font_cursive, "cursive");
-   checkFont(prefs.font_fantasy, "fantasy");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  checkFont(prefs.font_sans_serif, "sans-serif");
+  checkFont(prefs.font_serif, "serif");
+  checkFont(prefs.font_monospace, "monospace");
+  checkFont(prefs.font_cursive, "cursive");
+  checkFont(prefs.font_fantasy, "fantasy");
 }
 
 /*
@@ -305,24 +317,26 @@ static void checkPreferredFonts()
  */
 static void setUIColorWdef(Fl_Color idx, int32_t color, Fl_Color default_val)
 {
-   if (color != -1)
-      Fl::set_color(idx, color << 8);
-   else if (default_val != 0xFFFFFFFF)
-      Fl::set_color(idx, default_val);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (color != -1)
+    Fl::set_color(idx, color << 8);
+  else if (default_val != 0xFFFFFFFF)
+    Fl::set_color(idx, default_val);
 }
 
 static void setColors()
 {
-   /* The main background is a special case because Fl::background() will
-    * set the "gray ramp", which is a set of lighter and darker colors based
-    * on the main background and used for box edges and such.
-    */
-   if (prefs.ui_main_bg_color != -1) {
-      uchar r = prefs.ui_main_bg_color >> 16,
-            g = prefs.ui_main_bg_color >> 8 & 0xff,
-            b = prefs.ui_main_bg_color & 0xff;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  /* The main background is a special case because Fl::background() will
+   * set the "gray ramp", which is a set of lighter and darker colors based
+   * on the main background and used for box edges and such.
+   */
+  if (prefs.ui_main_bg_color != -1) {
+    uchar r = prefs.ui_main_bg_color >> 16,
+          g = prefs.ui_main_bg_color >> 8 & 0xff,
+          b = prefs.ui_main_bg_color & 0xff;
 
-      Fl::background(r, g, b);
+    Fl::background(r, g, b);
    }
 
    setUIColorWdef(FL_BACKGROUND2_COLOR, prefs.ui_text_bg_color, 0xFFFFFFFF);
@@ -347,17 +361,18 @@ static void setColors()
  */
 static DilloUrl *makeStartUrl(char *str, bool local)
 {
-   char *url_str, *p;
-   DilloUrl *start_url;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *url_str, *p;
+  DilloUrl *start_url;
 
-   /* Relative path to a local file? */
-   p = (*str == '/') ? dStrdup(str) :
-                       dStrconcat(Paths::getOldWorkingDir(), "/", str, NULL);
+  /* Relative path to a local file? */
+  p = (*str == '/') ? dStrdup(str)
+                    : dStrconcat(Paths::getOldWorkingDir(), "/", str, NULL);
 
-   if (access(p, F_OK) == 0) {
-      /* absolute path may have non-URL characters */
-      url_str = a_Misc_escape_chars(p, "% #");
-      start_url = a_Url_new(url_str + 1, "file:/");
+  if (access(p, F_OK) == 0) {
+    /* absolute path may have non-URL characters */
+    url_str = a_Misc_escape_chars(p, "% #");
+    start_url = a_Url_new(url_str + 1, "file:/");
    } else {
       /* Not a file, filter URL string */
       url_str = a_Url_string_strip_delimiters(str);
@@ -377,63 +392,64 @@ static DilloUrl *makeStartUrl(char *str, bool local)
  */
 int main(int argc, char **argv)
 {
-   DBG_OBJ_COLOR("#c0ff80", "dw::*");
-   DBG_OBJ_COLOR("#c0c0ff", "dw::fltk::*");
-   DBG_OBJ_COLOR("#ffa0a0", "dw::core::*");
-   DBG_OBJ_COLOR("#ffe0a0", "dw::core::style::*");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DBG_OBJ_COLOR("#c0ff80", "dw::*");
+  DBG_OBJ_COLOR("#c0c0ff", "dw::fltk::*");
+  DBG_OBJ_COLOR("#ffa0a0", "dw::core::*");
+  DBG_OBJ_COLOR("#ffe0a0", "dw::core::style::*");
 
-   uint_t opt_id;
-   uint_t options_got = 0;
-   uint32_t xid = 0;
-   int idx = 1;
-   int xpos = PREFS_GEOMETRY_DEFAULT_XPOS, ypos = PREFS_GEOMETRY_DEFAULT_YPOS,
-       width = PREFS_GEOMETRY_DEFAULT_WIDTH,
-       height = PREFS_GEOMETRY_DEFAULT_HEIGHT;
-   char **opt_argv;
-   FILE *fp;
+  uint_t opt_id;
+  uint_t options_got = 0;
+  uint32_t xid = 0;
+  int idx = 1;
+  int xpos = PREFS_GEOMETRY_DEFAULT_XPOS, ypos = PREFS_GEOMETRY_DEFAULT_YPOS,
+      width = PREFS_GEOMETRY_DEFAULT_WIDTH,
+      height = PREFS_GEOMETRY_DEFAULT_HEIGHT;
+  char **opt_argv;
+  FILE *fp;
 
-   srand((uint_t)(time(0) ^ getpid()));
+  srand((uint_t)(time(0) ^ getpid()));
 
-   // Some OSes exit dillo without this (not GNU/Linux).
-   signal(SIGPIPE, SIG_IGN);
-   // Establish our custom SIGCHLD handler
-   est_sigchld();
+  // Some OSes exit dillo without this (not GNU/Linux).
+  signal(SIGPIPE, SIG_IGN);
+  // Establish our custom SIGCHLD handler
+  est_sigchld();
 
-   /* Handle command line options */
-   opt_argv = dNew0(char*, numOptions(Options) + 1);
-   while ((opt_id = getCmdOption(Options, argc, argv, opt_argv, &idx))) {
-      options_got |= opt_id;
-      switch (opt_id) {
-      case DILLO_CLI_FULLWINDOW:
-      case DILLO_CLI_LOCAL:
-         break;
-      case DILLO_CLI_XID:
-      {
-         char *end;
-         xid = strtol(opt_argv[0], &end, 0);
-         if (*end) {
-            fprintf(stderr, "XID argument \"%s\" not valid.\n",opt_argv[0]);
-            return 2;
-         }
-         break;
+  /* Handle command line options */
+  opt_argv = dNew0(char *, numOptions(Options) + 1);
+  while ((opt_id = getCmdOption(Options, argc, argv, opt_argv, &idx))) {
+    options_got |= opt_id;
+    switch (opt_id) {
+    case DILLO_CLI_FULLWINDOW:
+    case DILLO_CLI_LOCAL:
+      break;
+    case DILLO_CLI_XID: {
+      char *end;
+      xid = strtol(opt_argv[0], &end, 0);
+      if (*end) {
+        fprintf(stderr, "XID argument \"%s\" not valid.\n", opt_argv[0]);
+        return 2;
       }
-      case DILLO_CLI_GEOMETRY:
-         if (!a_Misc_parse_geometry(opt_argv[0],&xpos,&ypos,&width,&height)){
-            fprintf(stderr, "geometry argument \"%s\" not valid. Must be of "
-                            "the form WxH[{+-}X{+-}Y].\n", opt_argv[0]);
-            return 2;
-         }
-         break;
-      case DILLO_CLI_VERSION:
-         puts("Dillo version " VERSION);
-         return 0;
-      case DILLO_CLI_HELP:
-         printHelp(argv[0], Options);
-         return 0;
-      default:
-         printHelp(argv[0], Options);
-         return 2;
+      break;
+    }
+    case DILLO_CLI_GEOMETRY:
+      if (!a_Misc_parse_geometry(opt_argv[0], &xpos, &ypos, &width, &height)) {
+        fprintf(stderr, "geometry argument \"%s\" not valid. Must be of "
+                        "the form WxH[{+-}X{+-}Y].\n",
+                opt_argv[0]);
+        return 2;
       }
+      break;
+    case DILLO_CLI_VERSION:
+      puts("Dillo version " VERSION);
+      return 0;
+    case DILLO_CLI_HELP:
+      printHelp(argv[0], Options);
+      return 0;
+    default:
+      printHelp(argv[0], Options);
+      return 2;
+    }
    }
    dFree(opt_argv);
 

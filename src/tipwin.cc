@@ -39,49 +39,55 @@ static void recent_timeout(void*);
  */
 TipWin::TipWin() : Fl_Menu_Window(1, 1)     // will autosize
 {
-   bgcolor = fl_color_cube(FL_NUM_RED - 1, FL_NUM_GREEN - 1, FL_NUM_BLUE - 2);
-   recent = 0;
-   strcpy(tip, "");
-   cur_widget = NULL;
-   set_override(); // no border
-   end();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  bgcolor = fl_color_cube(FL_NUM_RED - 1, FL_NUM_GREEN - 1, FL_NUM_BLUE - 2);
+  recent = 0;
+  strcpy(tip, "");
+  cur_widget = NULL;
+  set_override(); // no border
+  end();
 }
 
 void TipWin::draw()
 {
-   draw_box(FL_BORDER_BOX, 0, 0, w(), h(), bgcolor);
-   fl_color(FL_BLACK);
-   fl_font(labelfont(), labelsize());
-   fl_draw(tip, 3, 3, w() - 6, h() - 6,
-           //Fl_Align(FL_ALIGN_LEFT | FL_ALIGN_WRAP));
-           Fl_Align(FL_ALIGN_LEFT));
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  draw_box(FL_BORDER_BOX, 0, 0, w(), h(), bgcolor);
+  fl_color(FL_BLACK);
+  fl_font(labelfont(), labelsize());
+  fl_draw(tip, 3, 3, w() - 6, h() - 6,
+          // Fl_Align(FL_ALIGN_LEFT | FL_ALIGN_WRAP));
+          Fl_Align(FL_ALIGN_LEFT));
 }
 
 void TipWin::value(const char *s) {
-   // Recalc size of window
-   snprintf(tip, sizeof(tip) - 1, "%s", s);
-   fl_font(labelfont(), labelsize());
-   int W = w(), H = h();
-   W = 0;
-   fl_measure(tip, W, H, 0);
-   W += 8; H += 8;
-   size(W, H);
-   redraw();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  // Recalc size of window
+  snprintf(tip, sizeof(tip) - 1, "%s", s);
+  fl_font(labelfont(), labelsize());
+  int W = w(), H = h();
+  W = 0;
+  fl_measure(tip, W, H, 0);
+  W += 8;
+  H += 8;
+  size(W, H);
+  redraw();
 }
 
 void TipWin::do_show(void *wid) {
-   cur_widget = wid;  // Keep track of requesting widget
-   if (prefs.show_ui_tooltip) {
-      Fl::add_timeout(recent ? 0.2f : 0.8f, show_timeout);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  cur_widget = wid; // Keep track of requesting widget
+  if (prefs.show_ui_tooltip) {
+    Fl::add_timeout(recent ? 0.2f : 0.8f, show_timeout);
    }
 }
 
 void TipWin::do_hide() {
-   Fl::remove_timeout(show_timeout);
-   if (shown()) {
-      hide();
-      recent = 1;
-      Fl::add_timeout(0.8f, recent_timeout);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Fl::remove_timeout(show_timeout);
+  if (shown()) {
+    hide();
+    recent = 1;
+    Fl::add_timeout(0.8f, recent_timeout);
    }
 }
 
@@ -93,18 +99,20 @@ void TipWin::recent_tooltip(int val) {
 
 TipWin *my_tipwin(void)
 {
-   static TipWin *tw = NULL;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  static TipWin *tw = NULL;
 
-   if (!tw) {
-      Fl_Group *save = Fl_Group::current();    // save current widget..
-      tw = new TipWin();                       // ..because this trashes it
-      tw->hide();                              // start hidden
-      Fl_Group::current(save);                 // ..then back to previous.
+  if (!tw) {
+    Fl_Group *save = Fl_Group::current(); // save current widget..
+    tw = new TipWin();                    // ..because this trashes it
+    tw->hide();                           // start hidden
+    Fl_Group::current(save);              // ..then back to previous.
    }
    return tw;
 }
 
 static void show_timeout(void*) {
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
   // if offscreen, move tip ABOVE mouse instead
   int scr_x, scr_y, scr_w, scr_h;
   Fl::screen_xywh(scr_x, scr_y, scr_w, scr_h);
@@ -119,6 +127,7 @@ static void show_timeout(void*) {
 }
 
 static void recent_timeout(void*) {
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
   my_tipwin()->recent_tooltip(0);
 }
 
@@ -131,37 +140,41 @@ static void recent_timeout(void*) {
 TipWinButton::TipWinButton(int x, int y, int w, int h, const char *l) :
     Fl_Button(x, y, w, h, l)
 {
-   tipwin = my_tipwin();
-   mytooltip = strdup("empty");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  tipwin = my_tipwin();
+  mytooltip = strdup("empty");
 }
 
 TipWinButton::~TipWinButton(void)
 {
-   tipwin->cancel(this); // cancel tooltip if shown
-   free(mytooltip);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  tipwin->cancel(this); // cancel tooltip if shown
+  free(mytooltip);
 }
 
 int TipWinButton::handle(int e)
 {
-   switch (e) {
-   case FL_ENTER:
-      tipwin->value(mytooltip);
-      tipwin->do_show(this);
-      break;
-   case FL_PUSH:            // push mouse
-   case FL_RELEASE:         // release mouse
-   case FL_HIDE:            // widget goes away
-   case FL_LEAVE:           // leave focus
-      tipwin->do_hide();
-      break;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  switch (e) {
+  case FL_ENTER:
+    tipwin->value(mytooltip);
+    tipwin->do_show(this);
+    break;
+  case FL_PUSH:    // push mouse
+  case FL_RELEASE: // release mouse
+  case FL_HIDE:    // widget goes away
+  case FL_LEAVE:   // leave focus
+    tipwin->do_hide();
+    break;
    }
    return (Fl_Button::handle(e));
 }
 
 void TipWinButton::set_tooltip(const char *s)
 {
-   free(mytooltip);
-   mytooltip = strdup(s);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  free(mytooltip);
+  mytooltip = strdup(s);
 }
 
 
@@ -173,20 +186,22 @@ void TipWinButton::set_tooltip(const char *s)
 CustButton::CustButton(int x, int y, int w, int h, const char *l) :
    TipWinButton(x,y,w,h,l)
 {
-   norm_color = color();
-   light_color = PREFS_UI_BUTTON_HIGHLIGHT_COLOR;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  norm_color = color();
+  light_color = PREFS_UI_BUTTON_HIGHLIGHT_COLOR;
 }
 
 int CustButton::handle(int e)
 {
-   if (active()) {
-      if (e == FL_ENTER) {
-         color(light_color);
-         redraw();
-      } else if (e == FL_LEAVE || e == FL_RELEASE || e == FL_HIDE) {
-         color(norm_color);
-         redraw();
-      }
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (active()) {
+    if (e == FL_ENTER) {
+      color(light_color);
+      redraw();
+    } else if (e == FL_LEAVE || e == FL_RELEASE || e == FL_HIDE) {
+      color(norm_color);
+      redraw();
+    }
    } else if (e == FL_DEACTIVATE && color() != norm_color) {
       color(norm_color);
       redraw();
@@ -196,7 +211,8 @@ int CustButton::handle(int e)
 
 void CustButton::hl_color(Fl_Color col)
 {
-   light_color = col;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  light_color = col;
 }
 
 
@@ -208,37 +224,41 @@ void CustButton::hl_color(Fl_Color col)
 TipWinInput::TipWinInput (int x, int y, int w, int h, const char *l) :
    Fl_Input(x,y,w,h,l)
 {
-   tipwin = my_tipwin();
-   mytooltip = strdup("empty");
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  tipwin = my_tipwin();
+  mytooltip = strdup("empty");
 }
 
 TipWinInput::~TipWinInput(void)
 {
-   tipwin->cancel(this); // cancel tooltip if shown
-   free(mytooltip);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  tipwin->cancel(this); // cancel tooltip if shown
+  free(mytooltip);
 }
 
 int TipWinInput::handle(int e)
 {
-   switch (e) {
-   case FL_ENTER:
-      tipwin->value(mytooltip);
-      tipwin->do_show(this);
-      break;
-   case FL_PUSH:            // push mouse
-   case FL_RELEASE:         // release mouse
-   case FL_HIDE:            // widget goes away
-   case FL_LEAVE:           // leave focus
-   case FL_KEYBOARD:        // key press
-      tipwin->do_hide();
-      break;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  switch (e) {
+  case FL_ENTER:
+    tipwin->value(mytooltip);
+    tipwin->do_show(this);
+    break;
+  case FL_PUSH:     // push mouse
+  case FL_RELEASE:  // release mouse
+  case FL_HIDE:     // widget goes away
+  case FL_LEAVE:    // leave focus
+  case FL_KEYBOARD: // key press
+    tipwin->do_hide();
+    break;
    }
    return (Fl_Input::handle(e));
 }
 
 void TipWinInput::set_tooltip(const char *s)
 {
-   free(mytooltip);
-   mytooltip = strdup(s);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  free(mytooltip);
+  mytooltip = strdup(s);
 }
 

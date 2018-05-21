@@ -32,21 +32,22 @@ using namespace dw::core;
  */
 DilloImage *a_Image_new(void *layout, void *img_rndr, int32_t bg_color)
 {
-   DilloImage *Image;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloImage *Image;
 
-   Image = dNew(DilloImage, 1);
-   Image->layout = layout;
-   Image->img_rndr = img_rndr;
-   Image->width = 0;
-   Image->height = 0;
-   Image->bg_color = bg_color;
-   Image->ScanNumber = 0;
-   Image->BitVec = NULL;
-   Image->State = IMG_Empty;
+  Image = dNew(DilloImage, 1);
+  Image->layout = layout;
+  Image->img_rndr = img_rndr;
+  Image->width = 0;
+  Image->height = 0;
+  Image->bg_color = bg_color;
+  Image->ScanNumber = 0;
+  Image->BitVec = NULL;
+  Image->State = IMG_Empty;
 
-   Image->RefCount = 0;
+  Image->RefCount = 0;
 
-   return Image;
+  return Image;
 }
 
 /*
@@ -55,8 +56,9 @@ DilloImage *a_Image_new(void *layout, void *img_rndr, int32_t bg_color)
 DilloImage *a_Image_new_with_dw(void *layout, const char *alt_text,
                                 int32_t bg_color)
 {
-   dw::Image *dw = new dw::Image(alt_text);
-   return a_Image_new(layout, (void*)(dw::core::ImgRenderer*)dw, bg_color);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  dw::Image *dw = new dw::Image(alt_text);
+  return a_Image_new(layout, (void *)(dw::core::ImgRenderer *)dw, bg_color);
 }
 
 /*
@@ -67,15 +69,17 @@ DilloImage *a_Image_new_with_dw(void *layout, const char *alt_text,
  */
 void *a_Image_get_dw(DilloImage *Image)
 {
-   return (dw::Image*)(dw::core::ImgRenderer*)Image->img_rndr;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return (dw::Image *)(dw::core::ImgRenderer *)Image->img_rndr;
 }
 /*
  * Deallocate an Image structure
  */
 static void Image_free(DilloImage *Image)
 {
-   a_Bitvec_free(Image->BitVec);
-   dFree(Image);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Bitvec_free(Image->BitVec);
+  dFree(Image);
 }
 
 /*
@@ -84,9 +88,10 @@ static void Image_free(DilloImage *Image)
  */
 void a_Image_unref(DilloImage *Image)
 {
-   _MSG(" %d ", Image->RefCount);
-   if (Image && --Image->RefCount == 0)
-      Image_free(Image);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG(" %d ", Image->RefCount);
+  if (Image && --Image->RefCount == 0)
+    Image_free(Image);
 }
 
 /*
@@ -95,8 +100,9 @@ void a_Image_unref(DilloImage *Image)
  */
 void a_Image_ref(DilloImage *Image)
 {
-   if (Image)
-      ++Image->RefCount;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (Image)
+    ++Image->RefCount;
 }
 
 /*
@@ -106,18 +112,19 @@ void a_Image_set_parms(DilloImage *Image, void *v_imgbuf, DilloUrl *url,
                        int version, uint_t width, uint_t height,
                        DilloImgType type)
 {
-   _MSG("a_Image_set_parms: width=%d height=%d iw=%d ih=%d\n",
-        width, height, Image->width, Image->height);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("a_Image_set_parms: width=%d height=%d iw=%d ih=%d\n", width, height,
+       Image->width, Image->height);
 
-   /* Resize from 0,0 to width,height */
-   bool resize = true;
-   I2IR(Image)->setBuffer((Imgbuf*)v_imgbuf, resize);
+  /* Resize from 0,0 to width,height */
+  bool resize = true;
+  I2IR(Image)->setBuffer((Imgbuf *)v_imgbuf, resize);
 
-   if (!Image->BitVec)
-      Image->BitVec = a_Bitvec_new(height);
-   Image->width = width;
-   Image->height = height;
-   Image->State = IMG_SetParms;
+  if (!Image->BitVec)
+    Image->BitVec = a_Bitvec_new(height);
+  Image->width = width;
+  Image->height = height;
+  Image->State = IMG_SetParms;
 }
 
 /*
@@ -125,13 +132,14 @@ void a_Image_set_parms(DilloImage *Image, void *v_imgbuf, DilloUrl *url,
  */
 void a_Image_write(DilloImage *Image, uint_t y)
 {
-   _MSG("a_Image_write\n");
-   dReturn_if_fail ( y < Image->height );
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("a_Image_write\n");
+  dReturn_if_fail(y < Image->height);
 
-   /* Update the row in DwImage */
-   I2IR(Image)->drawRow(y);
-   a_Bitvec_set_bit(Image->BitVec, y);
-   Image->State = IMG_Write;
+  /* Update the row in DwImage */
+  I2IR(Image)->drawRow(y);
+  a_Bitvec_set_bit(Image->BitVec, y);
+  Image->State = IMG_Write;
 }
 
 /*
@@ -139,8 +147,9 @@ void a_Image_write(DilloImage *Image, uint_t y)
  */
 void a_Image_close(DilloImage *Image)
 {
-   _MSG("a_Image_close\n");
-   I2IR(Image)->finish();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("a_Image_close\n");
+  I2IR(Image)->finish();
 }
 
 /*
@@ -148,7 +157,8 @@ void a_Image_close(DilloImage *Image)
  */
 void a_Image_abort(DilloImage *Image)
 {
-   _MSG("a_Image_abort\n");
-   I2IR(Image)->fatal();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  _MSG("a_Image_abort\n");
+  I2IR(Image)->fatal();
 }
 

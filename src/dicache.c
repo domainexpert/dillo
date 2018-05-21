@@ -44,14 +44,15 @@ static uint_t dicache_size_total; /* invariant: dicache_size_total is
  */
 static int Dicache_entry_cmp(const void *v1, const void *v2)
 {
-   const DICacheEntry *e1 = v1, *e2 = v2;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const DICacheEntry *e1 = v1, *e2 = v2;
 
-   int st = a_Url_cmp(e1->url, e2->url);
-   if (st == 0) {
-      if (e2->version == DIC_Last)
-         st = (e1->Flags & DIF_Last ? 0 : -1);
-      else
-         st = (e1->version - e2->version);
+  int st = a_Url_cmp(e1->url, e2->url);
+  if (st == 0) {
+    if (e2->version == DIC_Last)
+      st = (e1->Flags & DIF_Last ? 0 : -1);
+    else
+      st = (e1->version - e2->version);
    }
    return st;
 }
@@ -61,8 +62,9 @@ static int Dicache_entry_cmp(const void *v1, const void *v2)
  */
 void a_Dicache_init(void)
 {
-   CachedIMGs = dList_new(256);
-   dicache_size_total = 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CachedIMGs = dList_new(256);
+  dicache_size_total = 0;
 }
 
 /*
@@ -70,27 +72,28 @@ void a_Dicache_init(void)
  */
 static DICacheEntry *Dicache_entry_new(void)
 {
-   DICacheEntry *entry = dNew(DICacheEntry, 1);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *entry = dNew(DICacheEntry, 1);
 
-   entry->width = 0;
-   entry->height = 0;
-   entry->Flags = DIF_Valid;
-   entry->SurvCleanup = 0;
-   entry->type = DILLO_IMG_TYPE_NOTSET;
-   entry->cmap = NULL;
-   entry->v_imgbuf = NULL;
-   entry->RefCount = 1;
-   entry->TotalSize = 0;
-   entry->ScanNumber = 0;
-   entry->BitVec = NULL;
-   entry->State = DIC_Empty;
-   entry->version = 1;
+  entry->width = 0;
+  entry->height = 0;
+  entry->Flags = DIF_Valid;
+  entry->SurvCleanup = 0;
+  entry->type = DILLO_IMG_TYPE_NOTSET;
+  entry->cmap = NULL;
+  entry->v_imgbuf = NULL;
+  entry->RefCount = 1;
+  entry->TotalSize = 0;
+  entry->ScanNumber = 0;
+  entry->BitVec = NULL;
+  entry->State = DIC_Empty;
+  entry->version = 1;
 
-   entry->Decoder = NULL;
-   entry->DecoderData = NULL;
-   entry->DecodedSize = 0;
+  entry->Decoder = NULL;
+  entry->DecoderData = NULL;
+  entry->DecodedSize = 0;
 
-   return entry;
+  return entry;
 }
 
 /*
@@ -99,16 +102,17 @@ static DICacheEntry *Dicache_entry_new(void)
  */
 static DICacheEntry *Dicache_add_entry(const DilloUrl *Url)
 {
-   DICacheEntry e, *entry, *last;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry e, *entry, *last;
 
-   entry = Dicache_entry_new();
-   e.url = (DilloUrl*)Url;
-   e.version = DIC_Last;
-   last = dList_find_sorted(CachedIMGs, &e, Dicache_entry_cmp);
-   if (last) {
-      /* URL is already in CachedIMGs, make a new version */
-      last->Flags &= ~DIF_Last;
-      entry->version = last->version + 1;
+  entry = Dicache_entry_new();
+  e.url = (DilloUrl *)Url;
+  e.version = DIC_Last;
+  last = dList_find_sorted(CachedIMGs, &e, Dicache_entry_cmp);
+  if (last) {
+    /* URL is already in CachedIMGs, make a new version */
+    last->Flags &= ~DIF_Last;
+    entry->version = last->version + 1;
    }
    entry->url = a_Url_dup(Url);
    entry->Flags |= DIF_Last;
@@ -126,16 +130,17 @@ static DICacheEntry *Dicache_add_entry(const DilloUrl *Url)
  */
 DICacheEntry *a_Dicache_get_entry(const DilloUrl *Url, int version)
 {
-   DICacheEntry e;
-   DICacheEntry *entry = NULL;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry e;
+  DICacheEntry *entry = NULL;
 
-   dReturn_val_if_fail(version != 0, NULL);
-   e.url = (DilloUrl*)Url;
-   e.version = version;
-   entry = dList_find_sorted(CachedIMGs, &e, Dicache_entry_cmp);
-   if (entry && !(entry->Flags & DIF_Valid) && version == DIC_Last)
-      entry = NULL;
-   return entry;
+  dReturn_val_if_fail(version != 0, NULL);
+  e.url = (DilloUrl *)Url;
+  e.version = version;
+  entry = dList_find_sorted(CachedIMGs, &e, Dicache_entry_cmp);
+  if (entry && !(entry->Flags & DIF_Valid) && version == DIC_Last)
+    entry = NULL;
+  return entry;
 }
 
 /*
@@ -143,27 +148,28 @@ DICacheEntry *a_Dicache_get_entry(const DilloUrl *Url, int version)
  */
 static void Dicache_remove(const DilloUrl *Url, int version)
 {
-   DICacheEntry e, *entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry e, *entry;
 
-   _MSG("Dicache_remove url=%s\n", URL_STR(Url));
-   e.url = (DilloUrl*)Url;
-   e.version = version;
-   entry = dList_find_sorted(CachedIMGs, &e, Dicache_entry_cmp);
-   dReturn_if (entry == NULL);
+  _MSG("Dicache_remove url=%s\n", URL_STR(Url));
+  e.url = (DilloUrl *)Url;
+  e.version = version;
+  entry = dList_find_sorted(CachedIMGs, &e, Dicache_entry_cmp);
+  dReturn_if(entry == NULL);
 
-   _MSG("Dicache_remove Imgbuf=%p Decoder=%p DecoderData=%p\n",
-       entry->v_imgbuf, entry->Decoder, entry->DecoderData);
-   /* Eliminate this dicache entry */
-   dList_remove(CachedIMGs, entry);
-   dicache_size_total -= entry->TotalSize;
+  _MSG("Dicache_remove Imgbuf=%p Decoder=%p DecoderData=%p\n", entry->v_imgbuf,
+       entry->Decoder, entry->DecoderData);
+  /* Eliminate this dicache entry */
+  dList_remove(CachedIMGs, entry);
+  dicache_size_total -= entry->TotalSize;
 
-   /* entry cleanup */
-   a_Url_free(entry->url);
-   dFree(entry->cmap);
-   a_Bitvec_free(entry->BitVec);
-   a_Imgbuf_unref(entry->v_imgbuf);
-   if (entry->Decoder) {
-      entry->Decoder(CA_Abort, entry->DecoderData);
+  /* entry cleanup */
+  a_Url_free(entry->url);
+  dFree(entry->cmap);
+  a_Bitvec_free(entry->BitVec);
+  a_Imgbuf_unref(entry->v_imgbuf);
+  if (entry->Decoder) {
+    entry->Decoder(CA_Abort, entry->DecoderData);
    }
    dFree(entry);
 }
@@ -176,15 +182,17 @@ static void Dicache_remove(const DilloUrl *Url, int version)
  */
 void a_Dicache_unref(const DilloUrl *Url, int version)
 {
-   DICacheEntry *entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *entry;
 
-   if ((entry = a_Dicache_get_entry(Url, version))) {
-      _MSG("a_Dicache_unref: RefCount=%d State=%d ImgbufLastRef=%d\n",
-          entry->RefCount, entry->State,
-          entry->v_imgbuf ? a_Imgbuf_last_reference(entry->v_imgbuf) : -1);
-      if (entry->RefCount > 0) --entry->RefCount;
-      if (entry->RefCount == 0 && entry->v_imgbuf == NULL)
-         Dicache_remove(Url, version);
+  if ((entry = a_Dicache_get_entry(Url, version))) {
+    _MSG("a_Dicache_unref: RefCount=%d State=%d ImgbufLastRef=%d\n",
+         entry->RefCount, entry->State,
+         entry->v_imgbuf ? a_Imgbuf_last_reference(entry->v_imgbuf) : -1);
+    if (entry->RefCount > 0)
+      --entry->RefCount;
+    if (entry->RefCount == 0 && entry->v_imgbuf == NULL)
+      Dicache_remove(Url, version);
    }
 }
 
@@ -193,10 +201,11 @@ void a_Dicache_unref(const DilloUrl *Url, int version)
  */
 DICacheEntry* a_Dicache_ref(const DilloUrl *Url, int version)
 {
-   DICacheEntry *entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *entry;
 
-   if ((entry = a_Dicache_get_entry(Url, version))) {
-      ++entry->RefCount;
+  if ((entry = a_Dicache_get_entry(Url, version))) {
+    ++entry->RefCount;
    }
    return entry;
 }
@@ -208,9 +217,10 @@ DICacheEntry* a_Dicache_ref(const DilloUrl *Url, int version)
  */
 void a_Dicache_invalidate_entry(const DilloUrl *Url)
 {
-   DICacheEntry *entry = a_Dicache_get_entry(Url, DIC_Last);
-   if (entry)
-      entry->Flags &= ~DIF_Valid;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *entry = a_Dicache_get_entry(Url, DIC_Last);
+  if (entry)
+    entry->Flags &= ~DIF_Valid;
 }
 
 
@@ -226,17 +236,18 @@ void a_Dicache_set_parms(DilloUrl *url, int version, DilloImage *Image,
                          uint_t width, uint_t height, DilloImgType type,
                          double gamma)
 {
-   DICacheEntry *DicEntry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *DicEntry;
 
-   _MSG("a_Dicache_set_parms (%s)\n", URL_STR(url));
-   dReturn_if_fail ( Image != NULL && width && height );
-   /* Find the DicEntry for this Image */
-   DicEntry = a_Dicache_get_entry(url, version);
-   dReturn_if_fail ( DicEntry != NULL );
-   /* Parameters already set? Don't do it twice. */
-   dReturn_if_fail ( DicEntry->State < DIC_SetParms );
+  _MSG("a_Dicache_set_parms (%s)\n", URL_STR(url));
+  dReturn_if_fail(Image != NULL && width && height);
+  /* Find the DicEntry for this Image */
+  DicEntry = a_Dicache_get_entry(url, version);
+  dReturn_if_fail(DicEntry != NULL);
+  /* Parameters already set? Don't do it twice. */
+  dReturn_if_fail(DicEntry->State < DIC_SetParms);
 
-   _MSG("  RefCount=%d version=%d\n", DicEntry->RefCount, DicEntry->version);
+  _MSG("  RefCount=%d version=%d\n", DicEntry->RefCount, DicEntry->version);
 
    /* BUG: there's just one image-type now */
    #define I_RGB 0
@@ -260,18 +271,19 @@ void a_Dicache_set_cmap(DilloUrl *url, int version, int bg_color,
                         const uchar_t *cmap, uint_t num_colors,
                         int num_colors_max, int bg_index)
 {
-   DICacheEntry *DicEntry = a_Dicache_get_entry(url, version);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *DicEntry = a_Dicache_get_entry(url, version);
 
-   _MSG("a_Dicache_set_cmap\n");
-   dReturn_if_fail ( DicEntry != NULL );
+  _MSG("a_Dicache_set_cmap\n");
+  dReturn_if_fail(DicEntry != NULL);
 
-   dFree(DicEntry->cmap);
-   DicEntry->cmap = dNew0(uchar_t, 3 * num_colors_max);
-   memcpy(DicEntry->cmap, cmap, 3 * num_colors);
-   if (bg_index >= 0 && (uint_t)bg_index < num_colors) {
-      DicEntry->cmap[bg_index * 3]     = (bg_color >> 16) & 0xff;
-      DicEntry->cmap[bg_index * 3 + 1] = (bg_color >> 8) & 0xff;
-      DicEntry->cmap[bg_index * 3 + 2] = (bg_color) & 0xff;
+  dFree(DicEntry->cmap);
+  DicEntry->cmap = dNew0(uchar_t, 3 * num_colors_max);
+  memcpy(DicEntry->cmap, cmap, 3 * num_colors);
+  if (bg_index >= 0 && (uint_t)bg_index < num_colors) {
+    DicEntry->cmap[bg_index * 3] = (bg_color >> 16) & 0xff;
+    DicEntry->cmap[bg_index * 3 + 1] = (bg_color >> 8) & 0xff;
+    DicEntry->cmap[bg_index * 3 + 2] = (bg_color)&0xff;
    }
 
    DicEntry->State = DIC_SetCmap;
@@ -282,15 +294,16 @@ void a_Dicache_set_cmap(DilloUrl *url, int version, int bg_color,
  */
 void a_Dicache_new_scan(const DilloUrl *url, int version)
 {
-   DICacheEntry *DicEntry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *DicEntry;
 
-   _MSG("a_Dicache_new_scan\n");
-   dReturn_if_fail ( url != NULL );
-   DicEntry = a_Dicache_get_entry(url, version);
-   dReturn_if_fail ( DicEntry != NULL );
-   if (DicEntry->State < DIC_SetParms) {
-      MSG("a_Dicache_new_scan before DIC_SetParms\n");
-      exit(1);
+  _MSG("a_Dicache_new_scan\n");
+  dReturn_if_fail(url != NULL);
+  DicEntry = a_Dicache_get_entry(url, version);
+  dReturn_if_fail(DicEntry != NULL);
+  if (DicEntry->State < DIC_SetParms) {
+    MSG("a_Dicache_new_scan before DIC_SetParms\n");
+    exit(1);
    }
    a_Bitvec_clear(DicEntry->BitVec);
    DicEntry->ScanNumber++;
@@ -305,19 +318,20 @@ void a_Dicache_new_scan(const DilloUrl *url, int version)
  */
 void a_Dicache_write(DilloUrl *url, int version, const uchar_t *buf, uint_t Y)
 {
-   DICacheEntry *DicEntry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *DicEntry;
 
-   _MSG("a_Dicache_write\n");
-   DicEntry = a_Dicache_get_entry(url, version);
-   dReturn_if_fail ( DicEntry != NULL );
-   dReturn_if_fail ( DicEntry->width > 0 && DicEntry->height > 0 );
+  _MSG("a_Dicache_write\n");
+  DicEntry = a_Dicache_get_entry(url, version);
+  dReturn_if_fail(DicEntry != NULL);
+  dReturn_if_fail(DicEntry->width > 0 && DicEntry->height > 0);
 
-   /* update the common buffer in the imgbuf */
-   a_Imgbuf_update(DicEntry->v_imgbuf, buf, DicEntry->type,
-                   DicEntry->cmap, DicEntry->width, DicEntry->height, Y);
+  /* update the common buffer in the imgbuf */
+  a_Imgbuf_update(DicEntry->v_imgbuf, buf, DicEntry->type, DicEntry->cmap,
+                  DicEntry->width, DicEntry->height, Y);
 
-   a_Bitvec_set_bit(DicEntry->BitVec, (int)Y);
-   DicEntry->State = DIC_Write;
+  a_Bitvec_set_bit(DicEntry->BitVec, (int)Y);
+  DicEntry->State = DIC_Write;
 }
 
 /*
@@ -325,23 +339,24 @@ void a_Dicache_write(DilloUrl *url, int version, const uchar_t *buf, uint_t Y)
  */
 void a_Dicache_close(DilloUrl *url, int version, CacheClient_t *Client)
 {
-   DilloWeb *Web = Client->Web;
-   DICacheEntry *DicEntry = a_Dicache_get_entry(url, version);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloWeb *Web = Client->Web;
+  DICacheEntry *DicEntry = a_Dicache_get_entry(url, version);
 
-   dReturn_if_fail ( DicEntry != NULL );
+  dReturn_if_fail(DicEntry != NULL);
 
-   /* a_Dicache_unref() may free DicEntry */
-   _MSG("a_Dicache_close RefCount=%d\n", DicEntry->RefCount - 1);
-   _MSG("a_Dicache_close DIC_Close=%d State=%d\n", DIC_Close, DicEntry->State);
-   _MSG(" a_Dicache_close imgbuf=%p Decoder=%p DecoderData=%p\n",
-        DicEntry->v_imgbuf, DicEntry->Decoder, DicEntry->DecoderData);
+  /* a_Dicache_unref() may free DicEntry */
+  _MSG("a_Dicache_close RefCount=%d\n", DicEntry->RefCount - 1);
+  _MSG("a_Dicache_close DIC_Close=%d State=%d\n", DIC_Close, DicEntry->State);
+  _MSG(" a_Dicache_close imgbuf=%p Decoder=%p DecoderData=%p\n",
+       DicEntry->v_imgbuf, DicEntry->Decoder, DicEntry->DecoderData);
 
-   if (DicEntry->State < DIC_Close) {
-      DicEntry->State = DIC_Close;
-      dFree(DicEntry->cmap);
-      DicEntry->cmap = NULL;
-      DicEntry->Decoder = NULL;
-      DicEntry->DecoderData = NULL;
+  if (DicEntry->State < DIC_Close) {
+    DicEntry->State = DIC_Close;
+    dFree(DicEntry->cmap);
+    DicEntry->cmap = NULL;
+    DicEntry->Decoder = NULL;
+    DicEntry->DecoderData = NULL;
    }
    a_Dicache_unref(url, version);
 
@@ -364,15 +379,16 @@ void a_Dicache_close(DilloUrl *url, int version, CacheClient_t *Client)
 static void *Dicache_image(int ImgType, const char *MimeType, void *Ptr,
                            CA_Callback_t *Call, void **Data)
 {
-   DilloWeb *web = Ptr;
-   DICacheEntry *DicEntry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloWeb *web = Ptr;
+  DICacheEntry *DicEntry;
 
-   dReturn_val_if_fail(MimeType && Ptr, NULL);
+  dReturn_val_if_fail(MimeType && Ptr, NULL);
 
-   if (!web->Image) {
-      web->Image =
-         a_Image_new_with_dw(web->bw->render_layout, NULL, web->bgColor);
-      a_Image_ref(web->Image);
+  if (!web->Image) {
+    web->Image =
+        a_Image_new_with_dw(web->bw->render_layout, NULL, web->bgColor);
+    a_Image_ref(web->Image);
    }
 
    DicEntry = a_Dicache_get_entry(web->url, DIC_Last);
@@ -412,7 +428,8 @@ static void *Dicache_image(int ImgType, const char *MimeType, void *Ptr,
 void *a_Dicache_png_image(const char *Type, void *Ptr, CA_Callback_t *Call,
                           void **Data)
 {
-   return Dicache_image(DIC_Png, Type, Ptr, Call, Data);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return Dicache_image(DIC_Png, Type, Ptr, Call, Data);
 }
 
 /*
@@ -421,7 +438,8 @@ void *a_Dicache_png_image(const char *Type, void *Ptr, CA_Callback_t *Call,
 void *a_Dicache_gif_image(const char *Type, void *Ptr, CA_Callback_t *Call,
                           void **Data)
 {
-   return Dicache_image(DIC_Gif, Type, Ptr, Call, Data);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return Dicache_image(DIC_Gif, Type, Ptr, Call, Data);
 }
 
 /*
@@ -430,7 +448,8 @@ void *a_Dicache_gif_image(const char *Type, void *Ptr, CA_Callback_t *Call,
 void *a_Dicache_jpeg_image(const char *Type, void *Ptr, CA_Callback_t *Call,
                            void **Data)
 {
-   return Dicache_image(DIC_Jpeg, Type, Ptr, Call, Data);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return Dicache_image(DIC_Jpeg, Type, Ptr, Call, Data);
 }
 
 /*
@@ -438,22 +457,23 @@ void *a_Dicache_jpeg_image(const char *Type, void *Ptr, CA_Callback_t *Call,
  */
 void a_Dicache_callback(int Op, CacheClient_t *Client)
 {
-   uint_t i;
-   DilloWeb *Web = Client->Web;
-   DilloImage *Image = Web->Image;
-   DICacheEntry *DicEntry = a_Dicache_get_entry(Web->url, DIC_Last);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  uint_t i;
+  DilloWeb *Web = Client->Web;
+  DilloImage *Image = Web->Image;
+  DICacheEntry *DicEntry = a_Dicache_get_entry(Web->url, DIC_Last);
 
-   dReturn_if_fail ( DicEntry != NULL );
+  dReturn_if_fail(DicEntry != NULL);
 
-   /* Copy the version number in the Client */
-   if (Client->Version == 0)
-      Client->Version = DicEntry->version;
+  /* Copy the version number in the Client */
+  if (Client->Version == 0)
+    Client->Version = DicEntry->version;
 
-   /* Only call the decoder when necessary */
-   if (Op == CA_Send && DicEntry->State < DIC_Close &&
-       DicEntry->DecodedSize < Client->BufSize) {
-      DicEntry->Decoder(Op, Client);
-      DicEntry->DecodedSize = Client->BufSize;
+  /* Only call the decoder when necessary */
+  if (Op == CA_Send && DicEntry->State < DIC_Close &&
+      DicEntry->DecodedSize < Client->BufSize) {
+    DicEntry->Decoder(Op, Client);
+    DicEntry->DecodedSize = Client->BufSize;
    } else if (Op == CA_Close || Op == CA_Abort) {
       if (DicEntry->State < DIC_Close) {
          DicEntry->Decoder(Op, Client);
@@ -506,20 +526,21 @@ void a_Dicache_callback(int Op, CacheClient_t *Client)
  */
 void a_Dicache_cleanup(void)
 {
-   int i;
-   DICacheEntry *entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
+  DICacheEntry *entry;
 
-   for (i = 0; (entry = dList_nth_data(CachedIMGs, i)); ++i) {
-      _MSG(" SurvCleanup = %d\n", entry->SurvCleanup);
-      if (entry->RefCount == 0 &&
-          (!entry->v_imgbuf || a_Imgbuf_last_reference(entry->v_imgbuf))) {
-         if (--entry->SurvCleanup >= 0)
-            continue;  /* keep the entry one more pass */
+  for (i = 0; (entry = dList_nth_data(CachedIMGs, i)); ++i) {
+    _MSG(" SurvCleanup = %d\n", entry->SurvCleanup);
+    if (entry->RefCount == 0 &&
+        (!entry->v_imgbuf || a_Imgbuf_last_reference(entry->v_imgbuf))) {
+      if (--entry->SurvCleanup >= 0)
+        continue; /* keep the entry one more pass */
 
-         /* free this unused entry */
-         Dicache_remove(entry->url, entry->version);
-         --i; /* adjust counter */
-      }
+      /* free this unused entry */
+      Dicache_remove(entry->url, entry->version);
+      --i; /* adjust counter */
+    }
    }
    MSG("a_Dicache_cleanup: length = %d\n", dList_length(CachedIMGs));
 }
@@ -532,17 +553,18 @@ void a_Dicache_cleanup(void)
  */
 void a_Dicache_freeall(void)
 {
-   DICacheEntry *entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DICacheEntry *entry;
 
-   /* Remove all the dicache entries */
-   while ((entry = dList_nth_data(CachedIMGs, dList_length(CachedIMGs)-1))) {
-      dList_remove_fast(CachedIMGs, entry);
-      a_Url_free(entry->url);
-      dFree(entry->cmap);
-      a_Bitvec_free(entry->BitVec);
-      a_Imgbuf_unref(entry->v_imgbuf);
-      dicache_size_total -= entry->TotalSize;
-      dFree(entry);
+  /* Remove all the dicache entries */
+  while ((entry = dList_nth_data(CachedIMGs, dList_length(CachedIMGs) - 1))) {
+    dList_remove_fast(CachedIMGs, entry);
+    a_Url_free(entry->url);
+    dFree(entry->cmap);
+    a_Bitvec_free(entry->BitVec);
+    a_Imgbuf_unref(entry->v_imgbuf);
+    dicache_size_total -= entry->TotalSize;
+    dFree(entry);
    }
    dList_free(CachedIMGs);
 }

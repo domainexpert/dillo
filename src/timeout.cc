@@ -22,7 +22,8 @@
  */
 void a_Timeout_add(float t, TimeoutCb_t cb, void *cbdata)
 {
-   Fl::add_timeout(t, cb, cbdata);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Fl::add_timeout(t, cb, cbdata);
 }
 
 /*
@@ -30,7 +31,8 @@ void a_Timeout_add(float t, TimeoutCb_t cb, void *cbdata)
  */
 void a_Timeout_repeat(float t, TimeoutCb_t cb, void *cbdata)
 {
-   Fl::add_timeout(t, cb, cbdata);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Fl::add_timeout(t, cb, cbdata);
 }
 
 /*
@@ -38,6 +40,7 @@ void a_Timeout_repeat(float t, TimeoutCb_t cb, void *cbdata)
  */
 void a_Timeout_remove()
 {
-   /* in FLTK, timeouts run one time by default */
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  /* in FLTK, timeouts run one time by default */
 }
 

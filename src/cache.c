@@ -93,9 +93,10 @@ static void Cache_entry_inject(const DilloUrl *Url, Dstr *data_ds);
  */
 static int Cache_entry_cmp(const void *v1, const void *v2)
 {
-   const CacheEntry_t *d1 = v1, *d2 = v2;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const CacheEntry_t *d1 = v1, *d2 = v2;
 
-   return a_Url_cmp(d1->Url, d2->Url);
+  return a_Url_cmp(d1->Url, d2->Url);
 }
 
 /*
@@ -103,10 +104,11 @@ static int Cache_entry_cmp(const void *v1, const void *v2)
  */
 static int Cache_entry_by_url_cmp(const void *v1, const void *v2)
 {
-   const DilloUrl *u1 = ((CacheEntry_t*)v1)->Url;
-   const DilloUrl *u2 = v2;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const DilloUrl *u1 = ((CacheEntry_t *)v1)->Url;
+  const DilloUrl *u2 = v2;
 
-   return a_Url_cmp(u1, u2);
+  return a_Url_cmp(u1, u2);
 }
 
 /*
@@ -114,17 +116,18 @@ static int Cache_entry_by_url_cmp(const void *v1, const void *v2)
  */
 void a_Cache_init(void)
 {
-   ClientQueue = dList_new(32);
-   DelayedQueue = dList_new(32);
-   CachedURLs = dList_new(256);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  ClientQueue = dList_new(32);
+  DelayedQueue = dList_new(32);
+  CachedURLs = dList_new(256);
 
-   /* inject the splash screen in the cache */
-   {
-      DilloUrl *url = a_Url_new("about:splash", NULL);
-      Dstr *ds = dStr_new(AboutSplash);
-      Cache_entry_inject(url, ds);
-      dStr_free(ds, 1);
-      a_Url_free(url);
+  /* inject the splash screen in the cache */
+  {
+    DilloUrl *url = a_Url_new("about:splash", NULL);
+    Dstr *ds = dStr_new(AboutSplash);
+    Cache_entry_inject(url, ds);
+    dStr_free(ds, 1);
+    a_Url_free(url);
    }
 }
 
@@ -138,27 +141,28 @@ void a_Cache_init(void)
 static int Cache_client_enqueue(const DilloUrl *Url, DilloWeb *Web,
                                  CA_Callback_t Callback, void *CbData)
 {
-   static int ClientKey = 0; /* Provide a primary key for each client */
-   CacheClient_t *NewClient;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  static int ClientKey = 0; /* Provide a primary key for each client */
+  CacheClient_t *NewClient;
 
-   if (ClientKey < INT_MAX) /* check for integer overflow */
-      ClientKey++;
-   else
-      ClientKey = 1;
+  if (ClientKey < INT_MAX) /* check for integer overflow */
+    ClientKey++;
+  else
+    ClientKey = 1;
 
-   NewClient = dNew(CacheClient_t, 1);
-   NewClient->Key = ClientKey;
-   NewClient->Url = Url;
-   NewClient->Version = 0;
-   NewClient->Buf = NULL;
-   NewClient->BufSize = 0;
-   NewClient->Callback = Callback;
-   NewClient->CbData = CbData;
-   NewClient->Web    = Web;
+  NewClient = dNew(CacheClient_t, 1);
+  NewClient->Key = ClientKey;
+  NewClient->Url = Url;
+  NewClient->Version = 0;
+  NewClient->Buf = NULL;
+  NewClient->BufSize = 0;
+  NewClient->Callback = Callback;
+  NewClient->CbData = CbData;
+  NewClient->Web = Web;
 
-   dList_append(ClientQueue, NewClient);
+  dList_append(ClientQueue, NewClient);
 
-   return ClientKey;
+  return ClientKey;
 }
 
 /*
@@ -166,7 +170,8 @@ static int Cache_client_enqueue(const DilloUrl *Url, DilloWeb *Web,
  */
 static int Cache_client_by_key_cmp(const void *client, const void *key)
 {
-   return ((CacheClient_t *)client)->Key - VOIDP2INT(key);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return ((CacheClient_t *)client)->Key - VOIDP2INT(key);
 }
 
 /*
@@ -174,10 +179,11 @@ static int Cache_client_by_key_cmp(const void *client, const void *key)
  */
 static void Cache_client_dequeue(CacheClient_t *Client)
 {
-   if (Client) {
-      dList_remove(ClientQueue, Client);
-      a_Web_free(Client->Web);
-      dFree(Client);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (Client) {
+    dList_remove(ClientQueue, Client);
+    a_Web_free(Client->Web);
+    dFree(Client);
    }
 }
 
@@ -189,23 +195,24 @@ static void Cache_client_dequeue(CacheClient_t *Client)
  */
 static void Cache_entry_init(CacheEntry_t *NewEntry, const DilloUrl *Url)
 {
-   NewEntry->Url = a_Url_dup(Url);
-   NewEntry->TypeDet = NULL;
-   NewEntry->TypeHdr = NULL;
-   NewEntry->TypeMeta = NULL;
-   NewEntry->TypeNorm = NULL;
-   NewEntry->Header = dStr_new("");
-   NewEntry->Location = NULL;
-   NewEntry->Auth = NULL;
-   NewEntry->Data = dStr_sized_new(8*1024);
-   NewEntry->UTF8Data = NULL;
-   NewEntry->DataRefcount = 0;
-   NewEntry->TransferDecoder = NULL;
-   NewEntry->ContentDecoder = NULL;
-   NewEntry->CharsetDecoder = NULL;
-   NewEntry->ExpectedSize = 0;
-   NewEntry->TransferSize = 0;
-   NewEntry->Flags = CA_IsEmpty;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  NewEntry->Url = a_Url_dup(Url);
+  NewEntry->TypeDet = NULL;
+  NewEntry->TypeHdr = NULL;
+  NewEntry->TypeMeta = NULL;
+  NewEntry->TypeNorm = NULL;
+  NewEntry->Header = dStr_new("");
+  NewEntry->Location = NULL;
+  NewEntry->Auth = NULL;
+  NewEntry->Data = dStr_sized_new(8 * 1024);
+  NewEntry->UTF8Data = NULL;
+  NewEntry->DataRefcount = 0;
+  NewEntry->TransferDecoder = NULL;
+  NewEntry->ContentDecoder = NULL;
+  NewEntry->CharsetDecoder = NULL;
+  NewEntry->ExpectedSize = 0;
+  NewEntry->TransferSize = 0;
+  NewEntry->Flags = CA_IsEmpty;
 }
 
 /*
@@ -214,7 +221,8 @@ static void Cache_entry_init(CacheEntry_t *NewEntry, const DilloUrl *Url)
  */
 static CacheEntry_t *Cache_entry_search(const DilloUrl *Url)
 {
-   return dList_find_sorted(CachedURLs, Url, Cache_entry_by_url_cmp);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return dList_find_sorted(CachedURLs, Url, Cache_entry_by_url_cmp);
 }
 
 /*
@@ -222,21 +230,22 @@ static CacheEntry_t *Cache_entry_search(const DilloUrl *Url)
  */
 static CacheEntry_t *Cache_entry_search_with_redirect(const DilloUrl *Url)
 {
-   int i;
-   CacheEntry_t *entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
+  CacheEntry_t *entry;
 
-   for (i = 0; (entry = Cache_entry_search(Url)); ++i) {
+  for (i = 0; (entry = Cache_entry_search(Url)); ++i) {
 
-      /* Test for a redirection loop */
-      if (entry->Flags & CA_RedirectLoop || i == 3) {
-         _MSG_WARN("Redirect loop for URL: >%s<\n", URL_STR_(Url));
-         break;
-      }
-      /* Test for a working redirection */
-      if (entry->Flags & CA_Redirect && entry->Location) {
-         Url = entry->Location;
-      } else
-         break;
+    /* Test for a redirection loop */
+    if (entry->Flags & CA_RedirectLoop || i == 3) {
+      _MSG_WARN("Redirect loop for URL: >%s<\n", URL_STR_(Url));
+      break;
+    }
+    /* Test for a working redirection */
+    if (entry->Flags & CA_Redirect && entry->Location) {
+      Url = entry->Location;
+    } else
+      break;
    }
    return entry;
 }
@@ -246,11 +255,12 @@ static CacheEntry_t *Cache_entry_search_with_redirect(const DilloUrl *Url)
  */
 static CacheEntry_t *Cache_entry_add(const DilloUrl *Url)
 {
-   CacheEntry_t *old_entry, *new_entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheEntry_t *old_entry, *new_entry;
 
-   if ((old_entry = Cache_entry_search(Url))) {
-      MSG_WARN("Cache_entry_add, leaking an entry.\n");
-      dList_remove(CachedURLs, old_entry);
+  if ((old_entry = Cache_entry_search(Url))) {
+    MSG_WARN("Cache_entry_add, leaking an entry.\n");
+    dList_remove(CachedURLs, old_entry);
    }
 
    new_entry = dNew(CacheEntry_t, 1);
@@ -265,17 +275,18 @@ static CacheEntry_t *Cache_entry_add(const DilloUrl *Url)
  */
 static void Cache_entry_inject(const DilloUrl *Url, Dstr *data_ds)
 {
-   CacheEntry_t *entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheEntry_t *entry;
 
-   if (!(entry = Cache_entry_search(Url)))
-      entry = Cache_entry_add(Url);
-   entry->Flags |= CA_GotData + CA_GotHeader + CA_GotLength + CA_InternalUrl;
-   if (data_ds->len)
-      entry->Flags &= ~CA_IsEmpty;
-   dStr_truncate(entry->Data, 0);
-   dStr_append_l(entry->Data, data_ds->str, data_ds->len);
-   dStr_fit(entry->Data);
-   entry->ExpectedSize = entry->TransferSize = entry->Data->len;
+  if (!(entry = Cache_entry_search(Url)))
+    entry = Cache_entry_add(Url);
+  entry->Flags |= CA_GotData + CA_GotHeader + CA_GotLength + CA_InternalUrl;
+  if (data_ds->len)
+    entry->Flags &= ~CA_IsEmpty;
+  dStr_truncate(entry->Data, 0);
+  dStr_append_l(entry->Data, data_ds->str, data_ds->len);
+  dStr_fit(entry->Data);
+  entry->ExpectedSize = entry->TransferSize = entry->Data->len;
 }
 
 /*
@@ -283,11 +294,12 @@ static void Cache_entry_inject(const DilloUrl *Url, Dstr *data_ds)
  */
 static void Cache_auth_free(Dlist *auth)
 {
-   int i;
-   void *auth_field;
-   for (i = 0; (auth_field = dList_nth_data(auth, i)); ++i)
-      dFree(auth_field);
-   dList_free(auth);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
+  void *auth_field;
+  for (i = 0; (auth_field = dList_nth_data(auth, i)); ++i)
+    dFree(auth_field);
+  dList_free(auth);
 }
 
 /*
@@ -295,23 +307,24 @@ static void Cache_auth_free(Dlist *auth)
  */
 static void Cache_entry_free(CacheEntry_t *entry)
 {
-   a_Url_free((DilloUrl *)entry->Url);
-   dFree(entry->TypeDet);
-   dFree(entry->TypeHdr);
-   dFree(entry->TypeMeta);
-   dFree(entry->TypeNorm);
-   dStr_free(entry->Header, TRUE);
-   a_Url_free((DilloUrl *)entry->Location);
-   Cache_auth_free(entry->Auth);
-   dStr_free(entry->Data, 1);
-   dStr_free(entry->UTF8Data, 1);
-   if (entry->CharsetDecoder)
-      a_Decode_free(entry->CharsetDecoder);
-   if (entry->TransferDecoder)
-      a_Decode_free(entry->TransferDecoder);
-   if (entry->ContentDecoder)
-      a_Decode_free(entry->ContentDecoder);
-   dFree(entry);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  a_Url_free((DilloUrl *)entry->Url);
+  dFree(entry->TypeDet);
+  dFree(entry->TypeHdr);
+  dFree(entry->TypeMeta);
+  dFree(entry->TypeNorm);
+  dStr_free(entry->Header, TRUE);
+  a_Url_free((DilloUrl *)entry->Location);
+  Cache_auth_free(entry->Auth);
+  dStr_free(entry->Data, 1);
+  dStr_free(entry->UTF8Data, 1);
+  if (entry->CharsetDecoder)
+    a_Decode_free(entry->CharsetDecoder);
+  if (entry->TransferDecoder)
+    a_Decode_free(entry->TransferDecoder);
+  if (entry->ContentDecoder)
+    a_Decode_free(entry->ContentDecoder);
+  dFree(entry);
 }
 
 /*
@@ -321,20 +334,21 @@ static void Cache_entry_free(CacheEntry_t *entry)
  */
 static void Cache_entry_remove(CacheEntry_t *entry, DilloUrl *url)
 {
-   int i;
-   CacheClient_t *Client;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i;
+  CacheClient_t *Client;
 
-   if (!entry && !(entry = Cache_entry_search(url)))
-      return;
-   if (entry->Flags & CA_InternalUrl)
-      return;
+  if (!entry && !(entry = Cache_entry_search(url)))
+    return;
+  if (entry->Flags & CA_InternalUrl)
+    return;
 
-   /* remove all clients for this entry */
-   for (i = 0; (Client = dList_nth_data(ClientQueue, i)); ++i) {
-      if (Client->Url == entry->Url) {
-         a_Cache_stop_client(Client->Key);
-         --i;
-      }
+  /* remove all clients for this entry */
+  for (i = 0; (Client = dList_nth_data(ClientQueue, i)); ++i) {
+    if (Client->Url == entry->Url) {
+      a_Cache_stop_client(Client->Key);
+      --i;
+    }
    }
 
    /* remove from DelayedQueue */
@@ -353,7 +367,8 @@ static void Cache_entry_remove(CacheEntry_t *entry, DilloUrl *url)
  */
 void a_Cache_entry_remove_by_url(DilloUrl *url)
 {
-   Cache_entry_remove(NULL, url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Cache_entry_remove(NULL, url);
 }
 
 /* Misc. operations ------------------------------------------------------- */
@@ -372,14 +387,15 @@ void a_Cache_entry_remove_by_url(DilloUrl *url)
  */
 int a_Cache_open_url(void *web, CA_Callback_t Call, void *CbData)
 {
-   int ClientKey;
-   CacheEntry_t *entry;
-   DilloWeb *Web = web;
-   DilloUrl *Url = Web->url;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int ClientKey;
+  CacheEntry_t *entry;
+  DilloWeb *Web = web;
+  DilloUrl *Url = Web->url;
 
-   if (URL_FLAGS(Url) & URL_E2EQuery) {
-      /* remove current entry */
-      Cache_entry_remove(NULL, Url);
+  if (URL_FLAGS(Url) & URL_E2EQuery) {
+    /* remove current entry */
+    Cache_entry_remove(NULL, Url);
    }
 
    if ((entry = Cache_entry_search(Url))) {
@@ -402,8 +418,9 @@ int a_Cache_open_url(void *web, CA_Callback_t Call, void *CbData)
  */
 uint_t a_Cache_get_flags(const DilloUrl *url)
 {
-   CacheEntry_t *entry = Cache_entry_search(url);
-   return (entry ? entry->Flags : 0);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheEntry_t *entry = Cache_entry_search(url);
+  return (entry ? entry->Flags : 0);
 }
 
 /*
@@ -411,8 +428,9 @@ uint_t a_Cache_get_flags(const DilloUrl *url)
  */
 uint_t a_Cache_get_flags_with_redirection(const DilloUrl *url)
 {
-   CacheEntry_t *entry = Cache_entry_search_with_redirect(url);
-   return (entry ? entry->Flags : 0);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheEntry_t *entry = Cache_entry_search_with_redirect(url);
+  return (entry ? entry->Flags : 0);
 }
 
 /*
@@ -420,16 +438,16 @@ uint_t a_Cache_get_flags_with_redirection(const DilloUrl *url)
  */
 static void Cache_ref_data(CacheEntry_t *entry)
 {
-   if (entry) {
-      entry->DataRefcount++;
-      _MSG("DataRefcount++: %d\n", entry->DataRefcount);
-      if (entry->CharsetDecoder &&
-          (!entry->UTF8Data || entry->DataRefcount == 1)) {
-         dStr_free(entry->UTF8Data, 1);
-         entry->UTF8Data = a_Decode_process(entry->CharsetDecoder,
-                                            entry->Data->str,
-                                            entry->Data->len);
-      }
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (entry) {
+    entry->DataRefcount++;
+    _MSG("DataRefcount++: %d\n", entry->DataRefcount);
+    if (entry->CharsetDecoder &&
+        (!entry->UTF8Data || entry->DataRefcount == 1)) {
+      dStr_free(entry->UTF8Data, 1);
+      entry->UTF8Data = a_Decode_process(entry->CharsetDecoder,
+                                         entry->Data->str, entry->Data->len);
+    }
    }
 }
 
@@ -438,19 +456,20 @@ static void Cache_ref_data(CacheEntry_t *entry)
  */
 static void Cache_unref_data(CacheEntry_t *entry)
 {
-   if (entry) {
-      entry->DataRefcount--;
-      _MSG("DataRefcount--: %d\n", entry->DataRefcount);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (entry) {
+    entry->DataRefcount--;
+    _MSG("DataRefcount--: %d\n", entry->DataRefcount);
 
-      if (entry->CharsetDecoder) {
-         if (entry->DataRefcount == 0) {
-            dStr_free(entry->UTF8Data, 1);
-            entry->UTF8Data = NULL;
-         } else if (entry->DataRefcount < 0) {
-            MSG_ERR("Cache_unref_data: negative refcount\n");
-            entry->DataRefcount = 0;
-         }
+    if (entry->CharsetDecoder) {
+      if (entry->DataRefcount == 0) {
+        dStr_free(entry->UTF8Data, 1);
+        entry->UTF8Data = NULL;
+      } else if (entry->DataRefcount < 0) {
+        MSG_ERR("Cache_unref_data: negative refcount\n");
+        entry->DataRefcount = 0;
       }
+    }
    }
 }
 
@@ -459,8 +478,11 @@ static void Cache_unref_data(CacheEntry_t *entry)
  */
 static const char *Cache_current_content_type(CacheEntry_t *entry)
 {
-   return entry->TypeNorm ? entry->TypeNorm : entry->TypeMeta ? entry->TypeMeta
-          : entry->TypeHdr ? entry->TypeHdr : entry->TypeDet;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return entry->TypeNorm ? entry->TypeNorm
+                         : entry->TypeMeta ? entry->TypeMeta
+                                           : entry->TypeHdr ? entry->TypeHdr
+                                                            : entry->TypeDet;
 }
 
 /*
@@ -468,9 +490,10 @@ static const char *Cache_current_content_type(CacheEntry_t *entry)
  */
 const char *a_Cache_get_content_type(const DilloUrl *url)
 {
-   CacheEntry_t *entry = Cache_entry_search_with_redirect(url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheEntry_t *entry = Cache_entry_search_with_redirect(url);
 
-   return (entry) ? Cache_current_content_type(entry) : NULL;
+  return (entry) ? Cache_current_content_type(entry) : NULL;
 }
 
 /*
@@ -478,7 +501,8 @@ const char *a_Cache_get_content_type(const DilloUrl *url)
  */
 static Dstr *Cache_data(CacheEntry_t *entry)
 {
-   return entry->UTF8Data ? entry->UTF8Data : entry->Data;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  return entry->UTF8Data ? entry->UTF8Data : entry->Data;
 }
 
 /*
@@ -489,18 +513,19 @@ static Dstr *Cache_data(CacheEntry_t *entry)
 const char *a_Cache_set_content_type(const DilloUrl *url, const char *ctype,
                                      const char *from)
 {
-   const char *curr;
-   char *major, *minor, *charset;
-   CacheEntry_t *entry = Cache_entry_search(url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  const char *curr;
+  char *major, *minor, *charset;
+  CacheEntry_t *entry = Cache_entry_search(url);
 
-   dReturn_val_if_fail (entry != NULL, NULL);
+  dReturn_val_if_fail(entry != NULL, NULL);
 
-   _MSG("a_Cache_set_content_type {%s} {%s}\n", ctype, URL_STR(url));
+  _MSG("a_Cache_set_content_type {%s} {%s}\n", ctype, URL_STR(url));
 
-   curr = Cache_current_content_type(entry);
-   if  (entry->TypeMeta || (*from == 'h' && entry->TypeHdr) ) {
-      /* Type is already been set. Do nothing.
-       * BTW, META overrides TypeHdr */
+  curr = Cache_current_content_type(entry);
+  if (entry->TypeMeta || (*from == 'h' && entry->TypeHdr)) {
+    /* Type is already been set. Do nothing.
+     * BTW, META overrides TypeHdr */
    } else {
       if (*from == 'h') {
          /* Content-Type from HTTP header */
@@ -543,13 +568,14 @@ const char *a_Cache_set_content_type(const DilloUrl *url, const char *ctype,
  */
 int a_Cache_get_buf(const DilloUrl *Url, char **PBuf, int *BufSize)
 {
-   CacheEntry_t *entry = Cache_entry_search_with_redirect(Url);
-   if (entry) {
-      Dstr *data;
-      Cache_ref_data(entry);
-      data = Cache_data(entry);
-      *PBuf = data->str;
-      *BufSize = data->len;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheEntry_t *entry = Cache_entry_search_with_redirect(Url);
+  if (entry) {
+    Dstr *data;
+    Cache_ref_data(entry);
+    data = Cache_data(entry);
+    *PBuf = data->str;
+    *BufSize = data->len;
    } else {
       *PBuf = NULL;
       *BufSize = 0;
@@ -562,7 +588,8 @@ int a_Cache_get_buf(const DilloUrl *Url, char **PBuf, int *BufSize)
  */
 void a_Cache_unref_buf(const DilloUrl *Url)
 {
-   Cache_unref_data(Cache_entry_search_with_redirect(Url));
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Cache_unref_data(Cache_entry_search_with_redirect(Url));
 }
 
 
@@ -574,31 +601,36 @@ void a_Cache_unref_buf(const DilloUrl *Url)
  */
 static char *Cache_parse_field(const char *header, const char *fieldname)
 {
-   char *field;
-   uint_t i, j;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *field;
+  uint_t i, j;
 
-   for (i = 0; header[i]; i++) {
-      /* Search fieldname */
-      for (j = 0; fieldname[j]; j++)
-        if (D_ASCII_TOLOWER(fieldname[j]) != D_ASCII_TOLOWER(header[i + j]))
-           break;
-      if (fieldname[j]) {
-         /* skip to next line */
-         for ( i += j; header[i] != '\n'; i++);
-         continue;
-      }
+  for (i = 0; header[i]; i++) {
+    /* Search fieldname */
+    for (j = 0; fieldname[j]; j++)
+      if (D_ASCII_TOLOWER(fieldname[j]) != D_ASCII_TOLOWER(header[i + j]))
+        break;
+    if (fieldname[j]) {
+      /* skip to next line */
+      for (i += j; header[i] != '\n'; i++)
+        ;
+      continue;
+    }
 
-      i += j;
-      if (header[i] == ':') {
-        /* Field found! */
-        while (header[++i] == ' ' || header[i] == '\t');
-        for (j = 0; header[i + j] != '\n'; j++);
-        while (j && (header[i + j - 1] == ' ' || header[i + j - 1] == '\t'))
-           j--;
-        field = dStrndup(header + i, j);
-        return field;
-      }
-      while (header[i] != '\n') i++;
+    i += j;
+    if (header[i] == ':') {
+      /* Field found! */
+      while (header[++i] == ' ' || header[i] == '\t')
+        ;
+      for (j = 0; header[i + j] != '\n'; j++)
+        ;
+      while (j && (header[i + j - 1] == ' ' || header[i + j - 1] == '\t'))
+        j--;
+      field = dStrndup(header + i, j);
+      return field;
+    }
+    while (header[i] != '\n')
+      i++;
    }
    return NULL;
 }
@@ -609,33 +641,38 @@ static char *Cache_parse_field(const char *header, const char *fieldname)
 static Dlist *Cache_parse_multiple_fields(const char *header,
                                           const char *fieldname)
 {
-   uint_t i, j;
-   Dlist *fields = dList_new(8);
-   char *field;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  uint_t i, j;
+  Dlist *fields = dList_new(8);
+  char *field;
 
-   for (i = 0; header[i]; i++) {
-      /* Search fieldname */
-      for (j = 0; fieldname[j]; j++)
-         if (D_ASCII_TOLOWER(fieldname[j]) != D_ASCII_TOLOWER(header[i + j]))
-            break;
-      if (fieldname[j]) {
-         /* skip to next line */
-         for (i += j; header[i] != '\n'; i++);
-         continue;
-      }
+  for (i = 0; header[i]; i++) {
+    /* Search fieldname */
+    for (j = 0; fieldname[j]; j++)
+      if (D_ASCII_TOLOWER(fieldname[j]) != D_ASCII_TOLOWER(header[i + j]))
+        break;
+    if (fieldname[j]) {
+      /* skip to next line */
+      for (i += j; header[i] != '\n'; i++)
+        ;
+      continue;
+    }
 
-      i += j;
-      if (header[i] == ':') {
-         /* Field found! */
-         while (header[++i] == ' ' || header[i] == '\t');
-         for (j = 0; header[i + j] != '\n'; j++);
-         while (j && (header[i + j - 1] == ' ' || header[i + j - 1] == '\t'))
-            j--;
-         field = dStrndup(header + i, j);
-         dList_append(fields, field);
-      } else {
-         while (header[i] != '\n') i++;
-      }
+    i += j;
+    if (header[i] == ':') {
+      /* Field found! */
+      while (header[++i] == ' ' || header[i] == '\t')
+        ;
+      for (j = 0; header[i + j] != '\n'; j++)
+        ;
+      while (j && (header[i + j - 1] == ' ' || header[i + j - 1] == '\t'))
+        j--;
+      field = dStrndup(header + i, j);
+      dList_append(fields, field);
+    } else {
+      while (header[i] != '\n')
+        i++;
+    }
    }
 
    if (dList_length(fields) == 0) {
@@ -651,8 +688,9 @@ static Dlist *Cache_parse_multiple_fields(const char *header,
  */
 static void Cache_parse_header(CacheEntry_t *entry)
 {
-   char *header = entry->Header->str;
-   char *Length, *Type, *location_str, *encoding;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  char *header = entry->Header->str;
+  char *Length, *Type, *location_str, *encoding;
 #ifndef DISABLE_COOKIES
    Dlist *Cookies;
 #endif
@@ -796,21 +834,22 @@ static void Cache_parse_header(CacheEntry_t *entry)
 static int Cache_get_header(CacheEntry_t *entry,
                             const char *buf, size_t buf_size)
 {
-   size_t N, i;
-   Dstr *hdr = entry->Header;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  size_t N, i;
+  Dstr *hdr = entry->Header;
 
-   /* Header finishes when N = 2 */
-   N = (hdr->len && hdr->str[hdr->len - 1] == '\n');
-   for (i = 0; i < buf_size && N < 2; ++i) {
-      if (buf[i] == '\r' || !buf[i])
-         continue;
-      if (N == 1 && (buf[i] == ' ' || buf[i] == '\t')) {
-         /* unfold multiple-line header */
-         _MSG("Multiple-line header!\n");
-         dStr_erase(hdr, hdr->len - 1, 1);
-      }
-      N = (buf[i] == '\n') ? N + 1 : 0;
-      dStr_append_c(hdr, buf[i]);
+  /* Header finishes when N = 2 */
+  N = (hdr->len && hdr->str[hdr->len - 1] == '\n');
+  for (i = 0; i < buf_size && N < 2; ++i) {
+    if (buf[i] == '\r' || !buf[i])
+      continue;
+    if (N == 1 && (buf[i] == ' ' || buf[i] == '\t')) {
+      /* unfold multiple-line header */
+      _MSG("Multiple-line header!\n");
+      dStr_erase(hdr, hdr->len - 1, 1);
+    }
+    N = (buf[i] == '\n') ? N + 1 : 0;
+    dStr_append_c(hdr, buf[i]);
    }
 
    if (N == 2) {
@@ -835,59 +874,61 @@ static int Cache_get_header(CacheEntry_t *entry,
 void a_Cache_process_dbuf(int Op, const char *buf, size_t buf_size,
                           const DilloUrl *Url)
 {
-   int offset, len;
-   const char *str;
-   Dstr *dstr1, *dstr2, *dstr3;
-   CacheEntry_t *entry = Cache_entry_search(Url);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int offset, len;
+  const char *str;
+  Dstr *dstr1, *dstr2, *dstr3;
+  CacheEntry_t *entry = Cache_entry_search(Url);
 
-   /* Assert a valid entry (not aborted) */
-   dReturn_if_fail (entry != NULL);
+  /* Assert a valid entry (not aborted) */
+  dReturn_if_fail(entry != NULL);
 
-   _MSG("__a_Cache_process_dbuf__\n");
+  _MSG("__a_Cache_process_dbuf__\n");
 
-   if (Op == IORead) {
-      /*
-       * Cache_get_header() will set CA_GotHeader if it has a full header, and
-       * Cache_parse_header() will unset it if the header ends being
-       * merely an informational response from the server (i.e., 100 Continue)
-       */
-      for (offset = 0; !(entry->Flags & CA_GotHeader) &&
-           (len = Cache_get_header(entry, buf + offset, buf_size - offset));
-           Cache_parse_header(entry) ) {
-         offset += len;
+  if (Op == IORead) {
+    /*
+     * Cache_get_header() will set CA_GotHeader if it has a full header, and
+     * Cache_parse_header() will unset it if the header ends being
+     * merely an informational response from the server (i.e., 100 Continue)
+     */
+    for (offset = 0;
+         !(entry->Flags & CA_GotHeader) &&
+         (len = Cache_get_header(entry, buf + offset, buf_size - offset));
+         Cache_parse_header(entry)) {
+      offset += len;
+    }
+
+    if (entry->Flags & CA_GotHeader) {
+      str = buf + offset;
+      len = buf_size - offset;
+      entry->TransferSize += len;
+      dstr1 = dstr2 = dstr3 = NULL;
+
+      /* Decode arrived data (<= 3 stages) */
+      if (entry->TransferDecoder) {
+        dstr1 = a_Decode_process(entry->TransferDecoder, str, len);
+        str = dstr1->str;
+        len = dstr1->len;
       }
-
-      if (entry->Flags & CA_GotHeader) {
-         str = buf + offset;
-         len = buf_size - offset;
-         entry->TransferSize += len;
-         dstr1 = dstr2 = dstr3 = NULL;
-
-         /* Decode arrived data (<= 3 stages) */
-         if (entry->TransferDecoder) {
-            dstr1 = a_Decode_process(entry->TransferDecoder, str, len);
-            str = dstr1->str;
-            len = dstr1->len;
-         }
-         if (entry->ContentDecoder) {
-            dstr2 = a_Decode_process(entry->ContentDecoder, str, len);
-            str = dstr2->str;
-            len = dstr2->len;
-         }
-         dStr_append_l(entry->Data, str, len);
-         if (entry->CharsetDecoder && entry->UTF8Data) {
-            dstr3 = a_Decode_process(entry->CharsetDecoder, str, len);
-            dStr_append_l(entry->UTF8Data, dstr3->str, dstr3->len);
-         }
-         dStr_free(dstr1, 1);
-         dStr_free(dstr2, 1);
-         dStr_free(dstr3, 1);
-
-         if (entry->Data->len)
-            entry->Flags &= ~CA_IsEmpty;
-
-         entry = Cache_process_queue(entry);
+      if (entry->ContentDecoder) {
+        dstr2 = a_Decode_process(entry->ContentDecoder, str, len);
+        str = dstr2->str;
+        len = dstr2->len;
       }
+      dStr_append_l(entry->Data, str, len);
+      if (entry->CharsetDecoder && entry->UTF8Data) {
+        dstr3 = a_Decode_process(entry->CharsetDecoder, str, len);
+        dStr_append_l(entry->UTF8Data, dstr3->str, dstr3->len);
+      }
+      dStr_free(dstr1, 1);
+      dStr_free(dstr2, 1);
+      dStr_free(dstr3, 1);
+
+      if (entry->Data->len)
+        entry->Flags &= ~CA_IsEmpty;
+
+      entry = Cache_process_queue(entry);
+    }
    } else if (Op == IOClose) {
       if ((entry->ExpectedSize || entry->TransferSize) &&
           entry->TypeHdr == NULL) {
@@ -939,14 +980,15 @@ void a_Cache_process_dbuf(int Op, const char *buf, size_t buf_size,
  */
 static int Cache_redirect(CacheEntry_t *entry, int Flags, BrowserWindow *bw)
 {
-   DilloUrl *NewUrl;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloUrl *NewUrl;
 
-   _MSG(" Cache_redirect: redirect_level = %d\n", bw->redirect_level);
+  _MSG(" Cache_redirect: redirect_level = %d\n", bw->redirect_level);
 
-   /* Don't allow redirection for SpamSafe/local URLs */
-   if (URL_FLAGS(entry->Url) & URL_SpamSafe) {
-      a_UIcmd_set_msg(bw, "WARNING: local URL with redirection.  Aborting.");
-      return 0;
+  /* Don't allow redirection for SpamSafe/local URLs */
+  if (URL_FLAGS(entry->Url) & URL_SpamSafe) {
+    a_UIcmd_set_msg(bw, "WARNING: local URL with redirection.  Aborting.");
+    return 0;
    }
 
    /* if there's a redirect loop, stop now */
@@ -997,14 +1039,15 @@ typedef struct {
  */
 static void Cache_auth_callback(void *vdata)
 {
-   CacheAuthData_t *data = (CacheAuthData_t *)vdata;
-   if (a_Auth_do_auth(data->auth, data->url))
-      a_Nav_reload(data->bw);
-   Cache_auth_free(data->auth);
-   a_Url_free(data->url);
-   dFree(data);
-   Cache_auth_entry(NULL, NULL);
-   a_Timeout_remove();
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheAuthData_t *data = (CacheAuthData_t *)vdata;
+  if (a_Auth_do_auth(data->auth, data->url))
+    a_Nav_reload(data->bw);
+  Cache_auth_free(data->auth);
+  a_Url_free(data->url);
+  dFree(data);
+  Cache_auth_entry(NULL, NULL);
+  a_Timeout_remove();
 }
 
 /*
@@ -1012,11 +1055,12 @@ static void Cache_auth_callback(void *vdata)
  */
 static void Cache_auth_entry(CacheEntry_t *entry, BrowserWindow *bw)
 {
-   static int busy = 0;
-   CacheAuthData_t *data;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  static int busy = 0;
+  CacheAuthData_t *data;
 
-   if (!entry) {
-      busy = 0;
+  if (!entry) {
+    busy = 0;
    } else if (busy) {
       MSG_WARN("Cache_auth_entry: caught busy!\n");
    } else if (entry->Auth) {
@@ -1036,11 +1080,12 @@ static void Cache_auth_entry(CacheEntry_t *entry, BrowserWindow *bw)
  */
 int a_Cache_download_enabled(const DilloUrl *url)
 {
-   if (!dStrAsciiCasecmp(URL_SCHEME(url), "http") ||
-       !dStrAsciiCasecmp(URL_SCHEME(url), "https") ||
-       !dStrAsciiCasecmp(URL_SCHEME(url), "ftp"))
-      return 1;
-   return 0;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  if (!dStrAsciiCasecmp(URL_SCHEME(url), "http") ||
+      !dStrAsciiCasecmp(URL_SCHEME(url), "https") ||
+      !dStrAsciiCasecmp(URL_SCHEME(url), "ftp"))
+    return 1;
+  return 0;
 }
 
 /*
@@ -1050,14 +1095,15 @@ int a_Cache_download_enabled(const DilloUrl *url)
  */
 static void Cache_null_client(int Op, CacheClient_t *Client)
 {
-   DilloWeb *Web = Client->Web;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloWeb *Web = Client->Web;
 
-   /* make the stop button insensitive when done */
-   if (Op == CA_Close) {
-      if (Web->flags & WEB_RootUrl) {
-         /* Remove this client from our active list */
-         a_Bw_close_client(Web->bw, Client->Key);
-      }
+  /* make the stop button insensitive when done */
+  if (Op == CA_Close) {
+    if (Web->flags & WEB_RootUrl) {
+      /* Remove this client from our active list */
+      a_Bw_close_client(Web->bw, Client->Key);
+    }
    }
 
    /* else ignore */
@@ -1076,11 +1122,12 @@ typedef struct {
  */
 static void Cache_savelink_cb(void *vdata)
 {
-   Cache_savelink_t *data = (Cache_savelink_t*) vdata;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  Cache_savelink_t *data = (Cache_savelink_t *)vdata;
 
-   a_UIcmd_save_link(data->bw, data->url);
-   a_Url_free(data->url);
-   dFree(data);
+  a_UIcmd_save_link(data->bw, data->url);
+  a_Url_free(data->url);
+  dFree(data);
 }
 
 /*
@@ -1089,19 +1136,22 @@ static void Cache_savelink_cb(void *vdata)
 static void Cache_provide_redirection_blocked_page(CacheEntry_t *entry,
                                                    CacheClient_t *client)
 {
-   DilloWeb *clientWeb = client->Web;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  DilloWeb *clientWeb = client->Web;
 
-   a_Web_dispatch_by_type("text/html", clientWeb, &client->Callback,
-                          &client->CbData);
-   client->Buf = dStrconcat("<!doctype html><html><body>"
-                    "Dillo blocked a redirection attempt from <a href=\"",
-                    URL_STR(entry->Url), "\">", URL_STR(entry->Url),
-                    "</a> to <a href=\"", URL_STR(entry->Location), "\">",
-                    URL_STR(entry->Location), "</a> based on your domainrc "
-                    "settings.</body></html>", NULL);
-   client->BufSize = strlen(client->Buf);
-   (client->Callback)(CA_Send, client);
-   dFree(client->Buf);
+  a_Web_dispatch_by_type("text/html", clientWeb, &client->Callback,
+                         &client->CbData);
+  client->Buf =
+      dStrconcat("<!doctype html><html><body>"
+                 "Dillo blocked a redirection attempt from <a href=\"",
+                 URL_STR(entry->Url), "\">", URL_STR(entry->Url),
+                 "</a> to <a href=\"", URL_STR(entry->Location), "\">",
+                 URL_STR(entry->Location), "</a> based on your domainrc "
+                                           "settings.</body></html>",
+                 NULL);
+  client->BufSize = strlen(client->Buf);
+  (client->Callback)(CA_Send, client);
+  dFree(client->Buf);
 }
 
 /*
@@ -1118,36 +1168,37 @@ static void Cache_provide_redirection_blocked_page(CacheEntry_t *entry,
  */
 static CacheEntry_t *Cache_process_queue(CacheEntry_t *entry)
 {
-   uint_t i;
-   int st;
-   const char *Type;
-   Dstr *data;
-   CacheClient_t *Client;
-   DilloWeb *ClientWeb;
-   BrowserWindow *Client_bw = NULL;
-   static bool_t Busy = FALSE;
-   bool_t AbortEntry = FALSE;
-   bool_t OfferDownload = FALSE;
-   bool_t TypeMismatch = FALSE;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  uint_t i;
+  int st;
+  const char *Type;
+  Dstr *data;
+  CacheClient_t *Client;
+  DilloWeb *ClientWeb;
+  BrowserWindow *Client_bw = NULL;
+  static bool_t Busy = FALSE;
+  bool_t AbortEntry = FALSE;
+  bool_t OfferDownload = FALSE;
+  bool_t TypeMismatch = FALSE;
 
-   if (Busy)
-      MSG_ERR("FATAL!: >>>> Cache_process_queue Caught busy!!! <<<<\n");
-   if (!(entry->Flags & CA_GotHeader))
-      return entry;
-   if (!(entry->Flags & CA_GotContentType)) {
-      st = a_Misc_get_content_type_from_data(
-              entry->Data->str, entry->Data->len, &Type);
-      _MSG("Cache: detected Content-Type '%s'\n", Type);
-      if (st == 0 || entry->Flags & CA_GotData) {
-         if (a_Misc_content_type_check(entry->TypeHdr, Type) < 0) {
-            MSG_HTTP("Content-Type '%s' doesn't match the real data.\n",
-                     entry->TypeHdr);
-            TypeMismatch = TRUE;
-         }
-         entry->TypeDet = dStrdup(Type);
-         entry->Flags |= CA_GotContentType;
-      } else
-         return entry;  /* i.e., wait for more data */
+  if (Busy)
+    MSG_ERR("FATAL!: >>>> Cache_process_queue Caught busy!!! <<<<\n");
+  if (!(entry->Flags & CA_GotHeader))
+    return entry;
+  if (!(entry->Flags & CA_GotContentType)) {
+    st = a_Misc_get_content_type_from_data(entry->Data->str, entry->Data->len,
+                                           &Type);
+    _MSG("Cache: detected Content-Type '%s'\n", Type);
+    if (st == 0 || entry->Flags & CA_GotData) {
+      if (a_Misc_content_type_check(entry->TypeHdr, Type) < 0) {
+        MSG_HTTP("Content-Type '%s' doesn't match the real data.\n",
+                 entry->TypeHdr);
+        TypeMismatch = TRUE;
+      }
+      entry->TypeDet = dStrdup(Type);
+      entry->Flags |= CA_GotContentType;
+    } else
+      return entry; /* i.e., wait for more data */
    }
 
    Busy = TRUE;
@@ -1300,14 +1351,15 @@ static CacheEntry_t *Cache_process_queue(CacheEntry_t *entry)
  */
 static void Cache_delayed_process_queue_callback()
 {
-   CacheEntry_t *entry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheEntry_t *entry;
 
-   while ((entry = (CacheEntry_t *)dList_nth_data(DelayedQueue, 0))) {
-      Cache_ref_data(entry);
-      if ((entry = Cache_process_queue(entry))) {
-         Cache_unref_data(entry);
-         dList_remove(DelayedQueue, entry);
-      }
+  while ((entry = (CacheEntry_t *)dList_nth_data(DelayedQueue, 0))) {
+    Cache_ref_data(entry);
+    if ((entry = Cache_process_queue(entry))) {
+      Cache_unref_data(entry);
+      dList_remove(DelayedQueue, entry);
+    }
    }
    DelayedQueueIdleId = 0;
    a_Timeout_remove();
@@ -1318,14 +1370,15 @@ static void Cache_delayed_process_queue_callback()
  */
 static void Cache_delayed_process_queue(CacheEntry_t *entry)
 {
-   /* there's no need to repeat entries in the queue */
-   if (!dList_find(DelayedQueue, entry))
-      dList_append(DelayedQueue, entry);
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  /* there's no need to repeat entries in the queue */
+  if (!dList_find(DelayedQueue, entry))
+    dList_append(DelayedQueue, entry);
 
-   if (DelayedQueueIdleId == 0) {
-      _MSG("  Setting timeout callback\n");
-      a_Timeout_add(0.0, Cache_delayed_process_queue_callback, NULL);
-      DelayedQueueIdleId = 1;
+  if (DelayedQueueIdleId == 0) {
+    _MSG("  Setting timeout callback\n");
+    a_Timeout_add(0.0, Cache_delayed_process_queue_callback, NULL);
+    DelayedQueueIdleId = 1;
    }
 }
 
@@ -1336,16 +1389,17 @@ static void Cache_delayed_process_queue(CacheEntry_t *entry)
  */
 CacheClient_t *a_Cache_client_get_if_unique(int Key)
 {
-   int i, n = 0;
-   CacheClient_t *Client, *iClient;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  int i, n = 0;
+  CacheClient_t *Client, *iClient;
 
-   if ((Client = dList_find_custom(ClientQueue, INT2VOIDP(Key),
-                                   Cache_client_by_key_cmp))) {
-      for (i = 0; (iClient = dList_nth_data(ClientQueue, i)); ++i) {
-         if (iClient->Url == Client->Url) {
-            ++n;
-         }
+  if ((Client = dList_find_custom(ClientQueue, INT2VOIDP(Key),
+                                  Cache_client_by_key_cmp))) {
+    for (i = 0; (iClient = dList_nth_data(ClientQueue, i)); ++i) {
+      if (iClient->Url == Client->Url) {
+        ++n;
       }
+    }
    }
    return (n == 1) ? Client : NULL;
 }
@@ -1356,23 +1410,24 @@ CacheClient_t *a_Cache_client_get_if_unique(int Key)
  */
 void a_Cache_stop_client(int Key)
 {
-   CacheClient_t *Client;
-   CacheEntry_t *entry;
-   DICacheEntry *DicEntry;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheClient_t *Client;
+  CacheEntry_t *entry;
+  DICacheEntry *DicEntry;
 
-   /* The client can be in both queues at the same time */
-   if ((Client = dList_find_custom(ClientQueue, INT2VOIDP(Key),
-                                   Cache_client_by_key_cmp))) {
-      /* Dicache */
-      if ((DicEntry = a_Dicache_get_entry(Client->Url, Client->Version)))
-         a_Dicache_unref(Client->Url, Client->Version);
+  /* The client can be in both queues at the same time */
+  if ((Client = dList_find_custom(ClientQueue, INT2VOIDP(Key),
+                                  Cache_client_by_key_cmp))) {
+    /* Dicache */
+    if ((DicEntry = a_Dicache_get_entry(Client->Url, Client->Version)))
+      a_Dicache_unref(Client->Url, Client->Version);
 
-      /* DelayedQueue */
-      if ((entry = Cache_entry_search(Client->Url)))
-         dList_remove(DelayedQueue, entry);
+    /* DelayedQueue */
+    if ((entry = Cache_entry_search(Client->Url)))
+      dList_remove(DelayedQueue, entry);
 
-      /* Main queue */
-      Cache_client_dequeue(Client);
+    /* Main queue */
+    Cache_client_dequeue(Client);
 
    } else {
       _MSG("WARNING: Cache_stop_client, nonexistent client\n");
@@ -1385,17 +1440,18 @@ void a_Cache_stop_client(int Key)
  */
 void a_Cache_freeall(void)
 {
-   CacheClient_t *Client;
-   void *data;
+  printf("FUNCTION: %s\n", __PRETTY_FUNCTION__);
+  CacheClient_t *Client;
+  void *data;
 
-   /* free the client queue */
-   while ((Client = dList_nth_data(ClientQueue, 0)))
-      Cache_client_dequeue(Client);
+  /* free the client queue */
+  while ((Client = dList_nth_data(ClientQueue, 0)))
+    Cache_client_dequeue(Client);
 
-   /* Remove every cache entry */
-   while ((data = dList_nth_data(CachedURLs, 0))) {
-      dList_remove_fast(CachedURLs, data);
-      Cache_entry_free(data);
+  /* Remove every cache entry */
+  while ((data = dList_nth_data(CachedURLs, 0))) {
+    dList_remove_fast(CachedURLs, data);
+    Cache_entry_free(data);
    }
    /* Remove the cache list */
    dList_free(CachedURLs);
